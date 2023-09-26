@@ -1,0 +1,32 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generate file 1`] = `
+{
+  "contents": 
+"// @sourceHash 43efb7cecb4f08bcf22e679cf6cdeed5
+module FindMovie = {
+  let queryText = \`select Movie {
+          title,
+          status,
+          actors: {
+              name,
+              age
+          }
+      } filter 
+          .title = <str>$movieTitle\`
+
+  type args = {movieTitle: string}
+
+  type response = {title: string, status: [#Published | #Unpublished]}
+
+  let query = (client: EdgeDB.Client.t, args: args): promise<result<response, EdgeDB.Error.errorFromOperation>> => {
+    client->EdgeDB.QueryHelpers.singleRequired(queryText, ~args)
+  }
+}
+
+"
+,
+  "hash": "43efb7cecb4f08bcf22e679cf6cdeed5",
+  "path": "SomeQueryFile__edgeDb.res",
+}
+`;

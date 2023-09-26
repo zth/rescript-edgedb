@@ -1,0 +1,24 @@
+{
+  "name": "rescript-edgedb",
+  "uncurried": true,
+  "sources": [
+    {
+      "dir": "src"
+    },
+    {
+      "dir": "cli",
+      "type": "dev"
+    },
+    {
+      "dir": "test",
+      "type": "dev"
+    }
+  ],
+  "package-specs": {
+    "module": "es6",
+    "in-source": true
+  },
+  "suffix": ".mjs",
+  "bs-dependencies": ["@rescript/core"],
+  "bsc-flags": ["-open RescriptCore"]
+}
