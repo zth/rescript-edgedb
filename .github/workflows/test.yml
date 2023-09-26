@@ -35,3 +35,6 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Run bundled CLI
+        run: ./dist/Cli.js --help
