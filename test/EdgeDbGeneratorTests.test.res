@@ -1,5 +1,6 @@
 open TestFramework
 open EdgeDbGenerator
+open EdgeDbGenerator__Utils
 
 test("extracting queries from ReScript documents", () => {
   let analyzeQuery = async (_s: string) => Obj.magic(null)
@@ -121,4 +122,14 @@ test("generate file", () => {
       ],
     ),
   )->Expect.toMatchSnapshot
+})
+
+test("generate correct record prop names", () => {
+  expect(toReScriptPropName("one"))->Expect.toBe("one")
+  expect(toReScriptPropName("camelCased"))->Expect.toBe("camelCased")
+  expect(toReScriptPropName("One"))->Expect.toBe(`@as("One") one`)
+  expect(toReScriptPropName("$One"))->Expect.toBe(`@as("$One") one`)
+  expect(
+    toReScriptPropName("two_names_here$"),
+  )->Expect.toBe(`@as("two_names_here$") two_names_here`)
 })

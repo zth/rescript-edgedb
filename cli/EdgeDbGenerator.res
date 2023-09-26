@@ -185,7 +185,7 @@ module AnalyzeQuery = {
           | (subCodec, _) if subCodec->is(setCodec) => subCodec->getSubcodecs->Array.getUnsafe(0)
           | (subCodec, _) => subCodec
           }
-          `    ${/* TODO: @as() for invalid names */ field.name}${if (
+          `    ${toReScriptPropName(field.name)}${if (
               ctx.optionalNulls && field.cardinality === AT_MOST_ONE
             ) {
               "?"
