@@ -52,18 +52,45 @@ let usage = `Usage:
   generate                                                | Generates all EdgeDB code.
     [--output <path>]                                     | Where to emit all generated files.
     [--src <path>]                                        | The source folder for where to look for ReScript files.
-    [--watch]                                             | Runs this command in watch mode.`
+    [--watch]                                             | Runs this command in watch mode.
+    
+  unused-selections                                       | Check if we there are unused selections in your EdgeQL queries.
+    [--ci]                                                | Run in CI mode.`
 
 let main = async () => {
   switch args->List.fromArray {
-  | list{"-help" | "-h", ..._rest} => Console.log(usage)
+  | list{"--help" | "-h", ..._rest} => Console.log(usage)
+  | list{"unused-selections", ...options} =>
+    let args = options->List.toArray
+    debugging := args->CliUtils.hasArg("--debug")
+    let ci = args->CliUtils.hasArg("--ci")
+    let bsconfig =
+      adapter.path->EdgeDbGenerator__Utils.Adapter.resolve([adapter.process.cwd(), "bsconfig.json"])
+    try {
+      // Try to access the directory
+      await adapter.fs.access(bsconfig)
+    } catch {
+    | Exn.Error(_) =>
+      Console.error(`Could not find bsconfig.json. This command needs to run in the same directory as bsconfig.json.`)
+      adapter.process->EdgeDbGenerator__Utils.Adapter.exit(1)
+    }
+
+    Console.log("Analyzing project... (this might take a while)")
+
+    let results = await UnusedSelections.readReanalyzeOutput()
+
+    UnusedSelections.reportResults(results)
+
+    if ci && results->Array.length > 0 {
+      adapter.process->EdgeDbGenerator__Utils.Adapter.exit(1)
+    }
   | list{"generate", ...options} =>
     open EdgeDbGenerator
 
+    let args = options->List.toArray
     debugging := args->CliUtils.hasArg("--debug")
 
     let root = await findEdgeDbRoot()
-    let args = options->List.toArray
     let watch = args->CliUtils.hasArg("--watch")
     let pathToGeneratedDir = switch args->CliUtils.getArgValue(["--output"]) {
     | None =>

@@ -1,4 +1,5 @@
 @module("bun:test") external test: (string, unit => unit) => unit = "test"
+@module("bun:test") external describe: (string, unit => unit) => unit = "describe"
 @module("bun:test") external testAsync: (string, unit => promise<unit>) => unit = "test"
 
 module Expect = {

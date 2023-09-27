@@ -30,3 +30,46 @@ module FindMovie = {
   "path": "SomeQueryFile__edgeDb.res",
 }
 `;
+
+exports[`extracting queries from ReScript documents it can extract from docs #1 1`] = `
+"select Movie {
+        title,
+        status,
+        actors: {
+            name,
+            age
+        }
+    } filter 
+        .title = <str>$movieTitle"
+`;
+
+exports[`extracting queries from ReScript documents it can extract from docs #2 1`] = `
+"select Movie {
+          title,
+          status,
+          actors: {
+              name,
+              age
+          }
+      } filter 
+          .title = <str>$movieTitle"
+`;
+
+exports[`extracting queries from ReScript documents it can extract from docs #2 2`] = `
+"select Movie {
+            title,
+            status,
+            actors: {
+                name,
+                age
+            }
+        } filter 
+            .title = <str>$movieTitle"
+`;
+
+exports[`extracting queries from ReScript documents it can extract from docs #2 3`] = `
+"select User {
+            name
+        } filter 
+            .id = <uuid>$userId"
+`;

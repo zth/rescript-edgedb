@@ -2,7 +2,7 @@ open TestFramework
 open EdgeDbGenerator
 open EdgeDbGenerator__Utils
 
-test("extracting queries from ReScript documents", () => {
+describe("extracting queries from ReScript documents", () => {
   let analyzeQuery = async (_s: string) => Obj.magic(null)
 
   testAsync("it can extract from docs #1", async () => {

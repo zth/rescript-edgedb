@@ -66,8 +66,10 @@ module Adapter = {
   type stdin = {isTTY: bool}
   @send external onData: (stdin, @as("data") _, string => unit) => unit = "on"
   @send external onEnd: (stdin, @as("end") _, unit => unit) => unit = "on"
+  @send external onClose: (stdin, @as("close") _, unit => unit) => unit = "on"
   type stdout = {isTTY: bool}
   type process = {cwd: unit => string, stdin: stdin, stdout: stdout}
+  @send external exit: (process, int) => 'any = "exit"
   type posix = {relative: (string, string) => string}
   type parseResult = {root: string}
   type path = {

@@ -30,8 +30,6 @@ let generateSetType = (typ: string, cardinality: cardinality): string => {
   }
 }
 
-let colorRed = str => `\x1b[31m${str}\x1b[0m`
-
 module Codec = {
   type t
 
@@ -287,9 +285,9 @@ module AnalyzeQuery = {
     | Exn.Error(err) =>
       errorMessage := err->Exn.message
       Console.error(
-        `${colorRed("ERROR in file")}: ${path}:\n${errorMessage.contents->Option.getWithDefault(
-            "-",
-          )}`,
+        `${CliUtils.colorRed(
+            "ERROR in file",
+          )}: ${path}:\n${errorMessage.contents->Option.getWithDefault("-")}`,
       )
       await holder->BaseClientPool.Holder.release
       None
@@ -496,7 +494,9 @@ let generateQueryFiles = async (
         }
       } catch {
       | Exn.Error(e) =>
-        Console.log(`${colorRed("Error in file")} './${adapter.path.posix.relative(root, path)}':`)
+        Console.log(
+          `${CliUtils.colorRed("Error in file")} './${adapter.path.posix.relative(root, path)}':`,
+        )
         Console.error(e)
       }
     }

@@ -1,0 +1,112 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it can extract results 1`] = `
+[
+  [
+    "QueryFile",
+    {
+      "fieldName": "age",
+      "queryName": "FindMovies",
+      "recordPath": [
+        "actors",
+      ],
+    },
+  ],
+  [
+    "QueryFile",
+    {
+      "fieldName": "title",
+      "queryName": "FindMovies",
+      "recordPath": undefined,
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "name",
+      "queryName": "FindMovieQuery",
+      "recordPath": [
+        "actors",
+      ],
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "age",
+      "queryName": "FindMovieQuery",
+      "recordPath": [
+        "actors",
+      ],
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "title",
+      "queryName": "FindMovieQuery",
+      "recordPath": undefined,
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "status",
+      "queryName": "FindMovieQuery",
+      "recordPath": undefined,
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "actors",
+      "queryName": "FindMovieQuery",
+      "recordPath": undefined,
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "name",
+      "queryName": "FindMovieQuery2",
+      "recordPath": [
+        "actors",
+      ],
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "age",
+      "queryName": "FindMovieQuery2",
+      "recordPath": [
+        "actors",
+      ],
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "title",
+      "queryName": "FindMovieQuery2",
+      "recordPath": undefined,
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "status",
+      "queryName": "FindMovieQuery2",
+      "recordPath": undefined,
+    },
+  ],
+  [
+    "SingleMovie6",
+    {
+      "fieldName": "actors",
+      "queryName": "FindMovieQuery2",
+      "recordPath": undefined,
+    },
+  ],
+]
+`;
