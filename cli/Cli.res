@@ -198,6 +198,34 @@ let main = async () => {
     if watch {
       open CliBindings
 
+      let migrationsCount = ref(-1)
+
+      let checkForSchemaChanges = async () => {
+        try {
+          debug("[schema change detection] Polling for schema changes...")
+          let migrations =
+            (await client
+            ->EdgeDB.QueryHelpers.single("select count(schema::Migration)"))
+            ->Option.getWithDefault(-1)
+
+          debug(`[schema change detection] Found ${migrations->Int.toString} migrations`)
+          let currentMigrationsCount = migrationsCount.contents
+          migrationsCount := migrations
+
+          if currentMigrationsCount > -1 && migrations !== migrationsCount.contents {
+            Console.log("Detected changes to EdgeDB schema. Regenerating queries...")
+            migrationsCount := migrations
+            await runGeneration()
+          }
+        } catch {
+        | Exn.Error(_) => ()
+        }
+      }
+
+      let _pollForSchemaChanges = setInterval(() => {
+        checkForSchemaChanges()->Promise.done
+      }, 5000)
+
       await runGeneration()
       Console.log(`Watching for changes in ${src}...`)
 
