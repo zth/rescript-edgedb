@@ -45,7 +45,7 @@ jobs:
         with:
           instance-name: "dbTestProject"
 
-      - name: Setup EdgeDB
+      - name: Init EdgDB
         working-directory: ./dbTestProject
         run: edgedb project init --non-interactive
 
