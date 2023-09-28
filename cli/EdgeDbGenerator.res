@@ -343,7 +343,6 @@ type queries = {
 }
 
 let getFileSourceHash = async filePath => {
-  Console.log("###1")
   switch await ReadFile.readFirstLine(filePath) {
   | Ok(firstLine) => firstLine->String.split("// @sourceHash ")->Array.get(1)
   | Error() => None

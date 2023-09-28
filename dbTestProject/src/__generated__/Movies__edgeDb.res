@@ -1,4 +1,4 @@
-// @sourceHash 01305a8db8adc45b940edf2e8fbf11b7
+// @sourceHash 03b34eabb42c7bd614713646823911b8
 module AllMovies = {
   let queryText = `select Movie {
       id,
@@ -8,7 +8,7 @@ module AllMovies = {
           name,
           numberOfPets := count(.pets)
       }
-    }`
+    } order by .title`
 
   type response_actors = {
     id: string,

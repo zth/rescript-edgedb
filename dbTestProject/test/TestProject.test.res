@@ -9,13 +9,28 @@ afterAllAsync(async () => {
   await client->EdgeDB.Client.close
 })
 
+@send external replaceAll: (string, RegExp.t, string) => string = "replaceAll"
+
+let removeIds = (key, value) => {
+  switch (key, value) {
+  | ("id", Js.Json.String(_)) => Js.Json.String("<id>")
+  | _ => value
+  }
+}
+
 describe("fetching data", () => {
   testAsync("fetching movies", async () => {
-    expect(await client->Movies.allMovies)->Expect.toMatchSnapshot
+    let movies = await client->Movies.allMovies
+    let movies =
+      movies->JSON.stringifyAnyWithReplacerAndIndent(removeIds, 2)->Option.getWithDefault("")
+    expect(movies)->Expect.toMatchSnapshot
   })
 
   testAsync("fetching single movie", async () => {
-    expect(await client->Movies.movieByTitle(~title="The Great Adventure"))->Expect.toMatchSnapshot
+    let movie = await client->Movies.movieByTitle(~title="The Great Adventure")
+    let movie =
+      movie->JSON.stringifyAnyWithReplacerAndIndent(removeIds, 2)->Option.getWithDefault("")
+    expect(movie)->Expect.toMatchSnapshot
   })
 
   testAsync("fetching non-existing movie", async () => {

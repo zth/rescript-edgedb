@@ -9,7 +9,7 @@ let allMovies = client => {
           name,
           numberOfPets := count(.pets)
       }
-    }
+    } order by .title
     `)
 
   client->query
