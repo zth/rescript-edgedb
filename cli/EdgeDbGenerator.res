@@ -1,5 +1,8 @@
 /* Most things in here are (loosely) ported from the existing `edgedb-js` tooling to ReScript. */
 open EdgeDbGenerator__Utils
+module Fs = NodeJs.Fs
+module Path = NodeJs.Path
+module Process = NodeJs.Process
 
 let rescriptExtensionPointRegex: RegExp.t = %re("/%edgeql\(`\s*#\s*@name\s+(.+)\s+([^`]+)`\)/g")
 
@@ -375,17 +378,16 @@ let generatedFileSuffix = "__edgeDb"
 
 let makeBaseGeneratedFileName = baseFileName => `${baseFileName}${generatedFileSuffix}`
 
-let filePathInGeneratedDir = (filePath, ~outputDir) =>
-  adapter.path->Adapter.join([outputDir, filePath])
+let filePathInGeneratedDir = (filePath, ~outputDir) => Path.join([outputDir, filePath])
 
 let getOutputBaseFileName = path => {
-  let queryFileName = adapter.path.basename(path, ".res")
+  let queryFileName = Path.basenameExt(path, ".res")
   let baseFileName = queryFileName
   makeBaseGeneratedFileName(baseFileName)
 }
 
 let generateFiles = (~path, ~queries: array<queries>): fileToGenerate => {
-  let queryFileName = adapter.path.basename(path, ".res")
+  let queryFileName = Path.basenameExt(path, ".res")
   let baseFileName = queryFileName
   let outputBaseFileName = `${baseFileName}__edgeDb`
   let fileOutput = []
@@ -441,7 +443,7 @@ let getMatches = (root: string) =>
     root,
     {
       match: [%re("/[^\/]\.res$/")],
-      skip: [%re("/node_modules/"), RegExp.fromString(`dbschema\\${adapter.path.sep}migrations`)],
+      skip: [%re("/node_modules/"), RegExp.fromString(`dbschema\\${Path.sep}migrations`)],
     },
   )
 
@@ -484,7 +486,7 @@ let generateQueryFiles = async (
       try {
         let fileText = await adapter.readFileUtf8(path)
         if fileText->String.includes("%edgeql(") {
-          fileModulesWithEdgeQLContent->Set.add(path->adapter.path.basename(".res"))
+          fileModulesWithEdgeQLContent->Set.add(path->Path.basenameExt(".res"))
           let queries =
             await fileText->extractQueriesFromReScript(
               ~analyzeQuery=AnalyzeQuery.analyzeQuery(client, ~path, ...),
@@ -531,7 +533,7 @@ let generateQueryFiles = async (
       }
       let _ = await Promise.all(
         filesInOutputDir->Array.map(async filePath => {
-          let fileModuleName = adapter.path.basename(filePath, generatedFileSuffix ++ ".res")
+          let fileModuleName = Path.basenameExt(filePath, generatedFileSuffix ++ ".res")
           if !(fileModulesWithEdgeQLContent->Set.has(fileModuleName)) {
             Console.log(`Deleting unused file ${filePath}...`)
             logCleanUnusedFiles()
@@ -548,15 +550,15 @@ let generateQueryFiles = async (
 
 let findEdgeDbRoot = async () => {
   let projectRoot = ref(None)
-  let currentDir = ref(adapter.process.cwd())
+  let currentDir = ref(Process.process->Process.cwd)
   let systemRoot = adapter.path.parse(currentDir.contents).root
   let break = ref(false)
   while currentDir.contents !== systemRoot && !break.contents {
-    if await adapter.exists(adapter.path->Adapter.join([currentDir.contents, "edgedb.toml"])) {
+    if await adapter.exists(Path.join([currentDir.contents, "edgedb.toml"])) {
       projectRoot := Some(currentDir.contents)
       break := true
     } else {
-      currentDir := adapter.path->Adapter.join([currentDir.contents, ".."])
+      currentDir := Path.join([currentDir.contents, ".."])
     }
   }
   projectRoot.contents

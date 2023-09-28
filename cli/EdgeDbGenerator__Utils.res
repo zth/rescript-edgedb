@@ -1,4 +1,5 @@
 module Adapter = {
+  // This is a big mess and should be cleaned up at some point
   type walkConfig = {
     match: array<RegExp.t>,
     skip: array<RegExp.t>,
@@ -15,7 +16,6 @@ module Adapter = {
   type posix = {relative: (string, string) => string}
   type parseResult = {root: string}
   type path = {
-    basename: (string, string) => string,
     posix: posix,
     sep: string,
     parse: string => parseResult,
@@ -42,6 +42,32 @@ module Adapter = {
 }
 
 @module("edgedb") external adapter: Adapter.t = "adapter"
+
+let isTTY = () => {
+  adapter.process.stdin.isTTY && adapter.process.stdout.isTTY
+}
+
+let promptForPassword = async (username: string) => {
+  if !isTTY() {
+    panic(
+      `Cannot use --password option in non-interactive mode. ` ++ `To read password from stdin use the --password-from-stdin option.`,
+    )
+  }
+
+  await adapter.input(`Password for '${username}': `, ~params={silent: true})
+}
+
+let readPasswordFromStdin = () => {
+  if adapter.process.stdin.isTTY {
+    panic(`Cannot read password from stdin: stdin is a TTY.`)
+  }
+
+  Promise.make((resolve, _reject) => {
+    let data = ref("")
+    adapter.process.stdin->Adapter.onData(chunk => data := data.contents ++ chunk)
+    adapter.process.stdin->Adapter.onEnd(() => resolve(data.contents->String.trimEnd))
+  })
+}
 
 let capitalizeString = str =>
   `${str->String.slice(~start=0, ~end=1)->String.toUpperCase}${str->String.sliceToEnd(~start=1)}`

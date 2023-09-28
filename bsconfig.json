@@ -20,5 +20,6 @@
   },
   "suffix": ".mjs",
   "bs-dependencies": ["@rescript/core"],
+  "bs-dev-dependencies": ["rescript-nodejs"],
   "bsc-flags": ["-open RescriptCore"]
 }

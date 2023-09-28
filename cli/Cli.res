@@ -3,7 +3,7 @@
 @val
 external argv: array<option<string>> = "process.argv"
 
-let args = argv->Array.sliceToEnd(~start=2)->Array.filterMap(arg => arg)
+let args = argv->Array.sliceToEnd(~start=2)->Array.keepSome
 
 @module("edgedb/dist/conUtils.js")
 external validTlsSecurityValues: array<string> = "validTlsSecurityValues"
@@ -15,32 +15,6 @@ external parseConnectArguments: EdgeDB.Client.connectConfig => promise<
 
 let adapter = EdgeDbGenerator__Utils.adapter
 module EdgeDbUtils = EdgeDbGenerator__Utils
-
-let isTTY = () => {
-  adapter.process.stdin.isTTY && adapter.process.stdout.isTTY
-}
-
-let promptForPassword = async (username: string) => {
-  if !isTTY() {
-    panic(
-      `Cannot use --password option in non-interactive mode. ` ++ `To read password from stdin use the --password-from-stdin option.`,
-    )
-  }
-
-  await adapter.input(`Password for '${username}': `, ~params={silent: true})
-}
-
-let readPasswordFromStdin = () => {
-  if adapter.process.stdin.isTTY {
-    panic(`Cannot read password from stdin: stdin is a TTY.`)
-  }
-
-  Promise.make((resolve, _reject) => {
-    let data = ref("")
-    adapter.process.stdin->EdgeDbUtils.Adapter.onData(chunk => data := data.contents ++ chunk)
-    adapter.process.stdin->EdgeDbUtils.Adapter.onEnd(() => resolve(data.contents->String.trimEnd))
-  })
-}
 
 let debugging = ref(false)
 let debug = msg =>
@@ -170,8 +144,8 @@ let main = async () => {
               password: "",
             })
           ).connectionParams.user
-          Some(await promptForPassword(username))
-        | Some(#FromStdin) => Some(await readPasswordFromStdin())
+          Some(await EdgeDbUtils.promptForPassword(username))
+        | Some(#FromStdin) => Some(await EdgeDbUtils.readPasswordFromStdin())
         },
       },
     )
@@ -250,7 +224,7 @@ let main = async () => {
           debug(`[deleted]: ${file}`)
           // Remove if accompanying generated file if it exists
           let asGeneratedFile = file->EdgeDbGenerator.getOutputBaseFileName ++ ".res"
-          let fileBaseName = file->EdgeDbUtils.adapter.path.basename(".res")
+          let fileBaseName = file->Path.basenameExt(".res")
 
           let potentialGeneratedFile = EdgeDbGenerator.filePathInGeneratedDir(
             asGeneratedFile,
