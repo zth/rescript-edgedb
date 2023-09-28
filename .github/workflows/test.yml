@@ -42,11 +42,10 @@ jobs:
 
       - name: Setup EdgeDB
         uses: edgedb/setup-edgedb@v1
-        working-directory: ./dbTestProject
         with:
           instance-name: "dbTestProject"
-          metadata-file: "edgedb.toml"
-          migrations-dir: "dbschema/migrations"
+          metadata-file: "dbTestProject/edgedb.toml"
+          migrations-dir: "dbTestProject/dbschema/migrations"
 
       - name: Setup and build DB test project
         working-directory: ./dbTestProject
