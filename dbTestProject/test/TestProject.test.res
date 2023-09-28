@@ -3,13 +3,10 @@ open TestFramework
 let client = EdgeDB.Client.make()
 
 external spawnSync: array<string> => 'a = "Bun.spawnSync"
-external process: 'a = "process"
 
 afterAllAsync(async () => {
   await client->EdgeDB.Client.close
 })
-
-@send external replaceAll: (string, RegExp.t, string) => string = "replaceAll"
 
 let removeIds = (key, value) => {
   switch (key, value) {
