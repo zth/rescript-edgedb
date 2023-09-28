@@ -1,4 +1,4 @@
-// @sourceHash 16f6ce89084f097aa7cf3106229fe5a9
+// @sourceHash f5c4a23c68c61812adbf3b131aabf509
 module AllMovies = {
   let queryText = `select Movie {
       id,
@@ -10,7 +10,7 @@ module AllMovies = {
       }
     } order by .title`
 
-  type response_actors = {
+  type response__actors = {
     id: string,
     name: string,
     numberOfPets: float,
@@ -19,7 +19,7 @@ module AllMovies = {
   type response = {
     id: string,
     title: string,
-    actors: array<response_actors>,
+    actors: array<response__actors>,
   }
 
   let query = (client: EdgeDB.Client.t): promise<array<response>> => {
@@ -48,7 +48,7 @@ module MovieByTitle = {
     title: string,
   }
 
-  type response_actors = {
+  type response__actors = {
     id: string,
     name: string,
     numberOfPets: float,
@@ -57,7 +57,7 @@ module MovieByTitle = {
   type response = {
     id: string,
     title: string,
-    actors: array<response_actors>,
+    actors: array<response__actors>,
   }
 
   let query = (client: EdgeDB.Client.t, args: args, ~onError=?): promise<option<response>> => {

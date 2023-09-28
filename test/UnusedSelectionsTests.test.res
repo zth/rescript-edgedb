@@ -10,9 +10,9 @@ let sampleReanalyzeOutput = `
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/QueryFile__edgeDb.res", line 19, characters 4-20
-  FindMovies.response_actors.age is a record label never used to read a value
+  FindMovies.response__actors.age is a record label never used to read a value
   <-- line 19
-      @dead("FindMovies.response_actors.age") age: Null.t<int>,
+      @dead("FindMovies.response__actors.age") age: Null.t<int>,
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/QueryFile__edgeDb.res", line 23, characters 4-17
@@ -38,15 +38,15 @@ let sampleReanalyzeOutput = `
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 18, characters 4-16
-  FindMovieQuery.response_actors.name is a record label never used to read a value
+  FindMovieQuery.response__actors.name is a record label never used to read a value
   <-- line 18
-      @dead("FindMovieQuery.response_actors.name") name: string,
+      @dead("FindMovieQuery.response__actors.name") name: string,
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 19, characters 4-20
-  FindMovieQuery.response_actors.age is a record label never used to read a value
+  FindMovieQuery.response__actors.age is a record label never used to read a value
   <-- line 19
-      @dead("FindMovieQuery.response_actors.age") age: Null.t<int>,
+      @dead("FindMovieQuery.response__actors.age") age: Null.t<int>,
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 23, characters 4-17
@@ -64,7 +64,7 @@ let sampleReanalyzeOutput = `
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 25, characters 4-34
   FindMovieQuery.response.actors is a record label never used to read a value
   <-- line 25
-      @dead("FindMovieQuery.response.actors") actors: array<response_actors>,
+      @dead("FindMovieQuery.response.actors") actors: array<response__actors>,
 
   Warning Dead Value
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 28, characters 2-141
@@ -90,15 +90,15 @@ let sampleReanalyzeOutput = `
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 49, characters 4-16
-  FindMovieQuery2.response_actors.name is a record label never used to read a value
+  FindMovieQuery2.response__actors.name is a record label never used to read a value
   <-- line 49
-      @dead("FindMovieQuery2.response_actors.name") name: string,
+      @dead("FindMovieQuery2.response__actors.name") name: string,
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 50, characters 4-20
-  FindMovieQuery2.response_actors.age is a record label never used to read a value
+  FindMovieQuery2.response__actors.age is a record label never used to read a value
   <-- line 50
-      @dead("FindMovieQuery2.response_actors.age") age: Null.t<int>,
+      @dead("FindMovieQuery2.response__actors.age") age: Null.t<int>,
 
   Warning Dead Type
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 54, characters 4-17
@@ -116,7 +116,7 @@ let sampleReanalyzeOutput = `
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 56, characters 4-34
   FindMovieQuery2.response.actors is a record label never used to read a value
   <-- line 56
-      @dead("FindMovieQuery2.response.actors") actors: array<response_actors>,
+      @dead("FindMovieQuery2.response.actors") actors: array<response__actors>,
 
   Warning Dead Value
   File "/Users/zth/OSS/edgedb-rescript/rescript/__generated__/SingleMovie6__edgeDb.res", line 59, characters 2-141
@@ -168,7 +168,7 @@ describe("extracting line info", () => {
   test("it handles record paths", () => {
     expect(
       extractLineInfo(
-        "  FindMovieQuery.response_actor.status is a record label never used to read a value",
+        "  FindMovieQuery.response__actor.status is a record label never used to read a value",
       ),
     )->Expect.toEqual(
       Some({

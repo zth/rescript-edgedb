@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "bun test test/",
+    "build": "npm run build:edgedb && npm run build:rescript",
     "build:rescript": "rescript build -with-deps",
     "build:edgedb": "rescript-edgedb generate --output ./src/__generated__ --src ./src",
     "watch:edgedb": "npm run build:edgedb -- --watch"

@@ -76,7 +76,7 @@ let uncapitalizeString = str =>
   `${str->String.slice(~start=0, ~end=1)->String.toLowerCase}${str->String.sliceToEnd(~start=1)}`
 
 let pathToName = path => {
-  let name = path->Array.joinWith("_")
+  let name = path->Array.joinWith("__")
 
   // Make valid ReScript record name.
   uncapitalizeString(name)

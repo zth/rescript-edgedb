@@ -32,7 +32,7 @@ let extractLineInfo = line => {
       Some({
         queryName,
         fieldName,
-        recordPath: switch recordName->String.split("_")->Array.sliceToEnd(~start=1) {
+        recordPath: switch recordName->String.split("__")->Array.sliceToEnd(~start=1) {
         | [] => None
         | path => Some(path)
         },
