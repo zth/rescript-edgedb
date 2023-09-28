@@ -1,0 +1,21 @@
+{
+  "name": "rescript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "bun test test/",
+    "build:rescript": "rescript build -with-deps",
+    "build:edgedb": "rescript-edgedb generate --output ./src/__generated__ --src ./src",
+    "watch:edgedb": "npm run build:edgedb -- --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rescript/core": "0.5.0",
+    "rescript": "11.0.0-rc.3",
+    "rescript-edgedb": "../",
+    "rescript-embed-lang": "0.1.0"
+  }
+}

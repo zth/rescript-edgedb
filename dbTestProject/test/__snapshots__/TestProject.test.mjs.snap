@@ -1,0 +1,80 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fetching data fetching movies 1`] = `
+[
+  {
+    "actors": [
+      {
+        "id": "a29aaa7e-5dd3-11ee-a767-3bd66df714fc",
+        "name": "John Doe",
+        "numberOfPets": 2,
+      },
+    ],
+    "id": "a29acc34-5dd3-11ee-a767-fbf4b67abfe9",
+    "title": "The Great Adventure",
+  },
+  {
+    "actors": [
+      {
+        "id": "a29ab99c-5dd3-11ee-a767-e7331339dd97",
+        "name": "Jane Smith",
+        "numberOfPets": 1,
+      },
+    ],
+    "id": "a29ad3aa-5dd3-11ee-a767-3f168b70341b",
+    "title": "The Mystery",
+  },
+  {
+    "actors": [
+      {
+        "id": "a29aaa7e-5dd3-11ee-a767-3bd66df714fc",
+        "name": "John Doe",
+        "numberOfPets": 2,
+      },
+      {
+        "id": "a29ab99c-5dd3-11ee-a767-e7331339dd97",
+        "name": "Jane Smith",
+        "numberOfPets": 1,
+      },
+      {
+        "id": "a29ac496-5dd3-11ee-a767-8b5ec9e4fb8d",
+        "name": "Bob Johnson",
+        "numberOfPets": 1,
+      },
+    ],
+    "id": "a29ad954-5dd3-11ee-a767-7362fc90a02f",
+    "title": "The Thriller",
+  },
+]
+`;
+
+exports[`fetching data fetching single movie 1`] = `
+{
+  "actors": [
+    {
+      "id": "a29aaa7e-5dd3-11ee-a767-3bd66df714fc",
+      "name": "John Doe",
+      "numberOfPets": 2,
+    },
+  ],
+  "id": "a29acc34-5dd3-11ee-a767-fbf4b67abfe9",
+  "title": "The Great Adventure",
+}
+`;
+
+exports[`fetching data fetching non-existing movie 1`] = `undefined`;
+
+exports[`run unused selections CLI 1`] = `
+"Analyzing project... (this might take a while)
+
+[31m✘[0m Found 4 unused selections.
+
+File "Movies":
+   In query "AllMovies":
+    - actors: numberOfPets
+    - title
+   In query "MovieByTitle":
+    - actors: name
+    - id
+"
+`;

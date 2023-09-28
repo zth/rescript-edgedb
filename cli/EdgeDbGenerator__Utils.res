@@ -1,63 +1,3 @@
-let capitalizeString = str =>
-  `${str->String.slice(~start=0, ~end=1)->String.toUpperCase}${str->String.sliceToEnd(~start=1)}`
-
-let uncapitalizeString = str =>
-  `${str->String.slice(~start=0, ~end=1)->String.toLowerCase}${str->String.sliceToEnd(~start=1)}`
-
-let pathToName = path => {
-  let name = path->Array.joinWith("_")
-
-  // Make valid ReScript record name.
-  uncapitalizeString(name)
-}
-
-module ReadFile = {
-  @module("fs")
-  external createReadStream: string => 'stream = "createReadStream"
-
-  type createInterfaceOptions<'stream> = {
-    input: 'stream,
-    crlfDelay: int,
-  }
-
-  @send external destroy: 'stream => unit = "destroy"
-
-  @module("readline")
-  external createInterface: createInterfaceOptions<'stream> => 'readlineInterface =
-    "createInterface"
-
-  let readFirstLine = (filePath: string): promise<result<string, unit>> => {
-    let readStream = createReadStream(filePath)
-    let rl = createInterface({
-      input: readStream,
-      crlfDelay: %raw("Infinity"),
-    })
-
-    Promise.make((resolve, _reject) => {
-      let _ = rl["on"]("line", (line: string) => {
-        let _ = rl["close"]() // Close the readline Interface to stop reading the file
-        readStream->destroy // Destroy the read stream to free up resources
-        resolve(Ok(line))
-      })
-
-      // Optional: Handle possible errors on the readStream
-      readStream["on"]("error", err => {
-        Console.error(err)
-        resolve(Error())
-      })
-    })
-  }
-}
-
-module Hash = {
-  type createHash
-  @module("crypto") external createHash: createHash = "createHash"
-  let hashContents: (createHash, string) => string = %raw(`function(createHash, contents) {
-    return createHash("md5").update(contents).digest("hex")
-  }`)
-  let hashContents = hashContents(createHash, ...)
-}
-
 module Adapter = {
   type walkConfig = {
     match: array<RegExp.t>,
@@ -65,6 +5,8 @@ module Adapter = {
   }
   type stdin = {isTTY: bool}
   @send external onData: (stdin, @as("data") _, string => unit) => unit = "on"
+  @send external onLine: (stdin, @as("line") _, string => unit) => unit = "on"
+  @send external onError: (stdin, @as("error") _, string => unit) => unit = "on"
   @send external onEnd: (stdin, @as("end") _, unit => unit) => unit = "on"
   @send external onClose: (stdin, @as("close") _, unit => unit) => unit = "on"
   type stdout = {isTTY: bool}
@@ -100,6 +42,65 @@ module Adapter = {
 }
 
 @module("edgedb") external adapter: Adapter.t = "adapter"
+
+let capitalizeString = str =>
+  `${str->String.slice(~start=0, ~end=1)->String.toUpperCase}${str->String.sliceToEnd(~start=1)}`
+
+let uncapitalizeString = str =>
+  `${str->String.slice(~start=0, ~end=1)->String.toLowerCase}${str->String.sliceToEnd(~start=1)}`
+
+let pathToName = path => {
+  let name = path->Array.joinWith("_")
+
+  // Make valid ReScript record name.
+  uncapitalizeString(name)
+}
+
+module ReadFile = {
+  @module("fs")
+  external createReadStream: string => 'stream = "createReadStream"
+
+  type createInterfaceOptions<'stream> = {
+    input: 'stream,
+    crlfDelay: int,
+  }
+
+  @send external destroy: 'stream => unit = "destroy"
+
+  @module("readline")
+  external createInterface: createInterfaceOptions<'stream> => 'readlineInterface =
+    "createInterface"
+
+  let readFirstLine = (filePath: string): promise<result<string, unit>> => {
+    let readStream = createReadStream(filePath)
+
+    let rl = createInterface({
+      input: readStream,
+      crlfDelay: %raw("Infinity"),
+    })
+
+    Promise.make((resolve, _reject) => {
+      let _ = rl->Adapter.onLine((line: string) => {
+        let _ = rl["close"]()
+        readStream->destroy
+        resolve(Ok(line))
+      })
+
+      rl->Adapter.onError(_err => {
+        resolve(Error())
+      })
+    })
+  }
+}
+
+module Hash = {
+  type createHash
+  @module("crypto") external createHash: createHash = "createHash"
+  let hashContents: (createHash, string) => string = %raw(`function(createHash, contents) {
+    return createHash("md5").update(contents).digest("hex")
+  }`)
+  let hashContents = hashContents(createHash, ...)
+}
 
 let disallowedIdentifiers = [
   "and",

@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
@@ -38,3 +39,19 @@ jobs:
 
       - name: Run bundled CLI
         run: ./dist/Cli.js --help
+
+      - name: Setup EdgeDB
+        uses: edgedb/setup-edgedb@v1
+        working-directory: ./dbTestProject
+        with:
+          instance-name: "dbTestProject"
+          metadata-file: "edgedb.toml"
+          migrations-dir: "dbschema/migrations"
+
+      - name: Setup and build DB test project
+        working-directory: ./dbTestProject
+        run: npm ci && npm run build:rescript && npm run build:edgedb
+
+      - name: Run DB tests
+        working-directory: ./dbTestProject
+        run: npm test
