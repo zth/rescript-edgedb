@@ -4,8 +4,6 @@ Use EdgeDB fully type safe in ReScript. Embed EdgeQL right in your ReScript sour
 
 ## Getting started
 
-`rescript-edgedb` consists of 2 parts: 1) a code generator that generates ReScript from your EdgeQL, and 2) a PPX transform that connects the generated code to your ReScript source, via [`rescript-embed-lang`](https://github.com/zth/rescript-embed-lang).
-
 ```bash
 npm i rescript-edgedb rescript-embed-lang
 ```
@@ -23,14 +21,15 @@ The `rescript-edgedb` watcher needs to run for your EdgeQL to be compiled. Set u
 
 ```json
 "scripts": {
-  "build:edgedb": "rescript-edgedb generate --output ./__generated__ --src ./src",
+  "build:edgedb": "rescript-edgedb generate --output ./src/__generated__ --src ./src",
   "watch:edgedb": "npm run build:edgedb -- --watch"
 }
 ```
 
 > The CLI will walk upwards looking for `edgedb.toml` in order to find how to connect to your database.
 
-`--src` should point to the root directory where you have ReScript files that contain `%edgeql` tags you want compiled. `---output` should point to the directory where you want all _generated_ files to end up. This needs to be a directory that's part of your ReScript project, so the ReScript compiler can pick them up.
+- `--src` should point to the root directory where you have ReScript files that contain `%edgeql` tags you want compiled. This directory will be searched (and watched) recursively.
+- `--output` should point to the directory where you want all _generated_ files to end up. This needs to be a directory that's part of your ReScript project, so the ReScript compiler can pick them up.
 
 ### Writing queries
 
@@ -51,7 +50,136 @@ let findMovies = %edgeql(`
       .title = <str>$movieTitle`)
 ```
 
-And this will generate a file called `Movies__edgeDb.res` which will contain the generated code and types for the `findMovies` query:
+Executing the query is done by passing it the `client`, and arguments if it takes any.
+
+```rescript
+let findMovie = %edgeql(`
+    # @name findMovies
+    select Movie {
+        title,
+        status,
+        actors: {
+            name,
+            age
+        }
+    } filter
+        .title = <str>$movieTitle`)
+
+// array<movie>
+let movies = await client->findMovies({
+    movieTitle: title,
+})
+```
+
+There's just one thing to notice in relation to regular EdgeQL - we require you to put a comment at the top of your query with a `@name` annotation, naming the query. This is because we need to be able to discern which query is which in the current ReScript file, since you can put as many queries as you want in the same ReScript file.
+
+### `let` binding or `module`
+
+EdgeQL can be written both as a `let` binding like above, or as a `module` binding:
+
+```rescript
+// Movies.res
+let findMovies = %edgeql(`
+  # @name findMovies
+  select Movie {
+      title,
+      status,
+      actors: {
+          name,
+          age
+      }
+  } filter
+    .title = <str>$movieTitle
+`)
+
+let movies = await client->findMovies({
+  movieTitle: "Jalla Jalla",
+})
+
+module DeleteMovie = %edgeql(`
+  # @name deleteMovie
+  delete Movie filter
+    .title = <str>$movieTitle
+`)
+
+let _maybeDeletedMovie = await client->DeleteMovie.query({
+  title: "Jalla Jalla"
+})
+```
+
+The _only_ difference between these two is that the `let` binding gives you access to the generated `query` (which you use to execute the query) directly, whereas the `module` binding gives you access to the _entire_ generated module for the EdgeQL you write. This includes `query` (like with the `let` binding), the generated types for all of the query contents (args and response), and an extra `transaction` function that you can use in transactions. More about transactions below.
+
+`let` binding style EdgeQL is the thing you'll use most of all - it's to the point, and can be defined anywhere. `module` bindings need to be at the top level. But, sometimes you need it.
+
+> We might consider adding a "transaction mode" to the `let` binding as well in the future. Defining the queries inline is very powerful, and forcing you to define things at the top level because of `module` isn't the best DX at all times.
+
+### Using transactions
+
+There's a `transaction` function emitted for each EdgeQL query. You can use that to do your operation in a transaction:
+
+```rescript
+let client = EdgeDB.Client.make()
+
+// Remember to define your EdgeQL using a module, so you get easy access to all generated functions.
+module InsertMovie = %edgeql(`
+  # @name insertMovie
+  insert Movie {
+      title := <str>$title,
+      status := <PublishStatus>$status
+  }`)
+
+await client->EdgeDB.Client.transaction(async tx => {
+  await tx->InsertMovie.transaction({
+    title: "Jalla Jalla",
+    status: #Published
+  })
+})
+```
+
+### Cardinality
+
+> Cardinality = how many results are returned from your query.
+
+EdgeDB and `rescript-edgedb` automatically manages the cardinality of each query for you. That means that you can always trust the return types of your query. For example, adding `limit 1` to the `findMovies` query above would make the return types `option<movie>` instead of `array<movie>`.
+
+Similarily, you can design the query so that it expects there to always be exactly 1 response, and error if that's not the case. In that case, the return type would be `result<movie, EdgeDB.Error.operationError>`.
+
+Here's a complete list of the responses your EdgeQL queries can produce:
+
+- `promise<void>` - Nothing. No results are returned at all.
+- `array<response>` - Many. A list of all results.
+- `option<response>` - Maybe one.
+- `result<response, EdgeDB.Error.errorFromOperation>` Exactly one. Or an error.
+
+## The CLI
+
+You can get a full list of supported CLI commands by running `npx rescript-edgedb --help`. More documentation on the exact parameters available is coming.
+
+## So, how does it work?
+
+`rescript-edgedb` consists of 2 parts:
+
+1. A code generator that generates ReScript from your EdgeQL.
+2. A PPX transform that swaps your `%edgeql` tag to its corresponding generated code, via [`rescript-embed-lang`](https://github.com/zth/rescript-embed-lang).
+
+Take this query as an example:
+
+```rescript
+// Movies.res
+let findMovies = %edgeql(`
+  # @name findMovies
+  select Movie {
+      title,
+      status,
+      actors: {
+          name,
+          age
+      }
+  } filter
+    .title = <str>$movieTitle`)
+```
+
+The `rescript-edgedb` tooling finds this `%edgeql` tag, and generates a file called `Movies__edgeDb.res` from it. That file will contain generated code and types for the `findMovies` query:
 
 ```rescript
 // @sourceHash 18807b4839373ee493a3aaab68766f53
@@ -84,64 +212,14 @@ module FindMoviesQuery = {
   let query = (client: EdgeDB.Client.t, args: args): promise<array<response>> => {
     client->EdgeDB.QueryHelpers.many(queryText, ~args)
   }
+
+  let transaction = (transaction: EdgeDB.Transaction.t, args: args): promise<array<response>> => {
+    transaction->EdgeDB.TransactionHelpers.many(queryText, ~args)
+  }
 }
 ```
 
-Thanks to `rescript-embed-lang`, you don't have to think about that generated file at all. It's automatically managed for you. Instead, you can simply use your `findMovie` value and execute your query, fully type safe:
-
-```rescript
-let findMovie = %edgeql(`
-    # @name findMovies
-    select Movie {
-        title,
-        status,
-        actors: {
-            name,
-            age
-        }
-    } filter
-        .title = <str>$movieTitle`)
-
-// array<movie>
-let movies = await client->findMovies({
-    movieTitle: title,
-})
-```
-
-There's just one thing to notice in relation to regular EdgeQL - we require you to put a comment at the top of your query with a `@name` annotation, naming the query. This is because we need to be able to discern which query is which in the current ReScript file, since you can put as many queries as you want in the same ReScript file.
-
-### Using transactions
-
-There's a `transaction` function emitted for each EdgeQL query. You can use that to do your operation in a transaction:
-
-```rescript
-let client = EdgeDB.Client.make()
-
-// Remember to define your EdgeQL using a module, so you get easy access to all generated functions.
-module InsertMovie = %edgeql(`
-  # @name insertMovie
-  insert Movie {
-      title := <str>$title,
-      status :=  <PublishStatus>$status
-  }`)
-
-await client->EdgeDB.Client.transaction(async tx => {
-  await tx->InsertMovie.transaction({
-    title: "Jalla Jalla",
-    status: #Published
-  })
-})
-```
-
-### Cardinality
-
-EdgeDB and `rescript-edgedb` automatically manages the cardinality of each query for you. That means that you can always trust the return types of your query. For example, adding `limit 1` to the `findMovies` query above would make the return types `option<movie>` instead of `array<movie>`.
-
-Similarily, you can design the query so that it expects there to always be exactly 1 response, and error if that's not the case. In that case, the return type would be `result<movie, EdgeDB.Error.operationError>`.
-
-## The CLI
-
-You can get a full list of supported CLI commands by running `npx rescript-edgedb --help`. More documentation on the exact parameters available is coming.
+Thanks to `rescript-embed-lang`, you don't have to think about that generated file at all. It's automatically managed for you.
 
 ## FAQ
 
