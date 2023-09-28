@@ -35,6 +35,33 @@ describe("fetching data", () => {
       await client->Movies.movieByTitle(~title="The Great Adventure 2"),
     )->Expect.toMatchSnapshot
   })
+
+  testAsync("running in a transaction", async () => {
+    let res = await client->EdgeDB.Client.transaction(
+      async transaction => {
+        await transaction->Movies.addActor({name: "Bruce Willis"})
+      },
+    )
+
+    expect(
+      switch res {
+      | Ok({id}) =>
+        let removed = await client->EdgeDB.Client.transaction(
+          async transaction => {
+            await transaction->Movies.removeActor({id: id})
+          },
+        )
+        switch removed {
+        | Some({id}) =>
+          // Just for the unused CLI output
+          let _id = id
+        | None => ()
+        }
+        id->String.length > 2
+      | Error(_) => false
+      },
+    )->Expect.toBe(true)
+  })
 })
 
 test("run unused selections CLI", () => {

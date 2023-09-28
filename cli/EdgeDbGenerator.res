@@ -414,6 +414,14 @@ ${params.types.distinctTypes->Set.values->Iterator.toArray->Array.joinWith("\n\n
           : ""}${extraInFnArgs}): ${returnType} => {
     client->EdgeDB.QueryHelpers.${method}(queryText${hasArgs ? ", ~args" : ""}${extraInFnApply})
   }
+
+  let transaction = (transaction: EdgeDB.Transaction.t${hasArgs
+          ? `, args: args`
+          : ""}${extraInFnArgs}): ${returnType} => {
+    transaction->EdgeDB.TransactionHelpers.${method}(queryText${hasArgs
+          ? ", ~args"
+          : ""}${extraInFnApply})
+  }
 }\n\n`,
     )
   })

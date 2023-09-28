@@ -35,3 +35,21 @@ let movieByTitle = (client, ~title) => {
     title: title,
   })
 }
+
+let _ = %edgeql(`
+  # @name AddActor
+  insert Person {
+    name := <str>$name
+  }
+`)
+
+// Workaround until new release of rescript-embed-lang
+let addActor = Movies__edgeDb.AddActor.transaction
+
+let _ = %edgeql(`
+  # @name RemoveActor
+  delete Person filter .id = <uuid>$id
+`)
+
+// Workaround until new release of rescript-embed-lang
+let removeActor = Movies__edgeDb.RemoveActor.transaction

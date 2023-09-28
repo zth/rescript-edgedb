@@ -5,7 +5,7 @@
   "main": "src/EdgeDB.mjs",
   "bin": "dist/Cli.js",
   "scripts": {
-    "test": "bun test test/",
+    "test": "bun test test/*.test.mjs",
     "build:res": "rescript",
     "build": "npm run build:res && esbuild --external:edgedb --external:chokidar --platform=node --bundle cli/Cli.mjs --outfile=dist/Cli.js"
   },

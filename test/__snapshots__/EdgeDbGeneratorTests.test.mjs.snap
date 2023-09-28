@@ -1,36 +1,5 @@
 // Bun Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`generate file 1`] = `
-{
-  "contents": 
-"// @sourceHash 43efb7cecb4f08bcf22e679cf6cdeed5
-module FindMovie = {
-  let queryText = \`select Movie {
-          title,
-          status,
-          actors: {
-              name,
-              age
-          }
-      } filter 
-          .title = <str>$movieTitle\`
-
-  type args = {movieTitle: string}
-
-  type response = {title: string, status: [#Published | #Unpublished]}
-
-  let query = (client: EdgeDB.Client.t, args: args): promise<result<response, EdgeDB.Error.errorFromOperation>> => {
-    client->EdgeDB.QueryHelpers.singleRequired(queryText, ~args)
-  }
-}
-
-"
-,
-  "hash": "43efb7cecb4f08bcf22e679cf6cdeed5",
-  "path": "SomeQueryFile__edgeDb.res",
-}
-`;
-
 exports[`extracting queries from ReScript documents it can extract from docs #1 1`] = `
 "select Movie {
         title,
@@ -72,4 +41,39 @@ exports[`extracting queries from ReScript documents it can extract from docs #2 
             name
         } filter 
             .id = <uuid>$userId"
+`;
+
+exports[`generate file 1`] = `
+{
+  "contents": 
+"// @sourceHash b71c2e4fb6a0ba65311c5fce81401d7a
+module FindMovie = {
+  let queryText = \`select Movie {
+          title,
+          status,
+          actors: {
+              name,
+              age
+          }
+      } filter 
+          .title = <str>$movieTitle\`
+
+  type args = {movieTitle: string}
+
+  type response = {title: string, status: [#Published | #Unpublished]}
+
+  let query = (client: EdgeDB.Client.t, args: args): promise<result<response, EdgeDB.Error.errorFromOperation>> => {
+    client->EdgeDB.QueryHelpers.singleRequired(queryText, ~args)
+  }
+
+  let transaction = (transaction: EdgeDB.Transaction.t, args: args): promise<result<response, EdgeDB.Error.errorFromOperation>> => {
+    transaction->EdgeDB.TransactionHelpers.singleRequired(queryText, ~args)
+  }
+}
+
+"
+,
+  "hash": "b71c2e4fb6a0ba65311c5fce81401d7a",
+  "path": "SomeQueryFile__edgeDb.res",
+}
 `;

@@ -1,8 +1,6 @@
 module Transaction = {
   type t
 
-  @module("edgedb") external make: unit => t = "createClient"
-
   @send external execute: (t, string, ~args: 'args=?) => promise<unit> = "execute"
 
   @send external query: (t, string, ~args: 'args=?) => promise<array<'result>> = "query"
@@ -396,6 +394,31 @@ module QueryHelpers = {
   /** Assumes exactly one item is going to be found, and errors if that's not the case. */
   let singleRequired = async (client, query, ~args=?) =>
     switch await Client.queryRequiredSingle(client, query, ~args) {
+    | v => Ok(v)
+    | exception Exn.Error(err) => Error(err->Error.fromExn)
+    }
+}
+
+module TransactionHelpers = {
+  /** Returns all found items as an array. */
+  let many = (client, query, ~args=?) => Transaction.query(client, query, ~args)
+
+  /** Returns a single item, if one was found. */
+  let single = async (client, query, ~args=?, ~onError=?) =>
+    switch await Transaction.querySingle(client, query, ~args) {
+    | Value(v) => Some(v)
+    | Null => None
+    | exception Exn.Error(err) =>
+      switch onError {
+      | None => ()
+      | Some(onError) => onError(err->Error.fromExn)
+      }
+      None
+    }
+
+  /** Assumes exactly one item is going to be found, and errors if that's not the case. */
+  let singleRequired = async (client, query, ~args=?) =>
+    switch await Transaction.queryRequiredSingle(client, query, ~args) {
     | v => Ok(v)
     | exception Exn.Error(err) => Error(err->Error.fromExn)
     }

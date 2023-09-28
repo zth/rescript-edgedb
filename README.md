@@ -110,6 +110,29 @@ let movies = await client->findMovies({
 
 There's just one thing to notice in relation to regular EdgeQL - we require you to put a comment at the top of your query with a `@name` annotation, naming the query. This is because we need to be able to discern which query is which in the current ReScript file, since you can put as many queries as you want in the same ReScript file.
 
+### Using transactions
+
+There's a `transaction` function emitted for each EdgeQL query. You can use that to do your operation in a transaction:
+
+```rescript
+let client = EdgeDB.Client.make()
+
+// Remember to define your EdgeQL using a module, so you get easy access to all generated functions.
+module InsertMovie = %edgeql(`
+  # @name insertMovie
+  insert Movie {
+      title := <str>$title,
+      status :=  <PublishStatus>$status
+  }`)
+
+await client->EdgeDB.Client.transaction(async tx => {
+  await tx->InsertMovie.transaction({
+    title: "Jalla Jalla",
+    status: #Published
+  })
+})
+```
+
 ### Cardinality
 
 EdgeDB and `rescript-edgedb` automatically manages the cardinality of each query for you. That means that you can always trust the return types of your query. For example, adding `limit 1` to the `findMovies` query above would make the return types `option<movie>` instead of `array<movie>`.
@@ -127,10 +150,10 @@ Yes, you should. This ensures building the project doesn't _have_ to rely on a r
 
 ## WIP
 
-- [ ] Simple transactions support
-- [ ] CLI to statically prevent overfetching
+- [x] Simple transactions support
+- [x] CLI to statically prevent overfetching
 - [ ] Improve CLI docs
-- [ ] Test/example project
+- [x] Test/example project
 - [ ] Figure out publishing
 - [ ] Generate docs using new ReScript doc generation
 

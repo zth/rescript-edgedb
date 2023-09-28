@@ -1,4 +1,4 @@
-// @sourceHash 03b34eabb42c7bd614713646823911b8
+// @sourceHash 16f6ce89084f097aa7cf3106229fe5a9
 module AllMovies = {
   let queryText = `select Movie {
       id,
@@ -24,6 +24,10 @@ module AllMovies = {
 
   let query = (client: EdgeDB.Client.t): promise<array<response>> => {
     client->EdgeDB.QueryHelpers.many(queryText)
+  }
+
+  let transaction = (transaction: EdgeDB.Transaction.t): promise<array<response>> => {
+    transaction->EdgeDB.TransactionHelpers.many(queryText)
   }
 }
 
@@ -58,6 +62,52 @@ module MovieByTitle = {
 
   let query = (client: EdgeDB.Client.t, args: args, ~onError=?): promise<option<response>> => {
     client->EdgeDB.QueryHelpers.single(queryText, ~args, ~onError?)
+  }
+
+  let transaction = (transaction: EdgeDB.Transaction.t, args: args, ~onError=?): promise<option<response>> => {
+    transaction->EdgeDB.TransactionHelpers.single(queryText, ~args, ~onError?)
+  }
+}
+
+module AddActor = {
+  let queryText = `insert Person {
+    name := <str>$name
+  }`
+
+  type args = {
+    name: string,
+  }
+
+  type response = {
+    id: string,
+  }
+
+  let query = (client: EdgeDB.Client.t, args: args): promise<result<response, EdgeDB.Error.errorFromOperation>> => {
+    client->EdgeDB.QueryHelpers.singleRequired(queryText, ~args)
+  }
+
+  let transaction = (transaction: EdgeDB.Transaction.t, args: args): promise<result<response, EdgeDB.Error.errorFromOperation>> => {
+    transaction->EdgeDB.TransactionHelpers.singleRequired(queryText, ~args)
+  }
+}
+
+module RemoveActor = {
+  let queryText = `delete Person filter .id = <uuid>$id`
+
+  type args = {
+    id: string,
+  }
+
+  type response = {
+    id: string,
+  }
+
+  let query = (client: EdgeDB.Client.t, args: args, ~onError=?): promise<option<response>> => {
+    client->EdgeDB.QueryHelpers.single(queryText, ~args, ~onError?)
+  }
+
+  let transaction = (transaction: EdgeDB.Transaction.t, args: args, ~onError=?): promise<option<response>> => {
+    transaction->EdgeDB.TransactionHelpers.single(queryText, ~args, ~onError?)
   }
 }
 
