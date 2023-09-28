@@ -1,21 +1,61 @@
 module Transaction = {
   type t
 
-  @send external execute: (t, string, ~args: 'args=?) => promise<unit> = "execute"
+  /**To execute a query without retrieving a result, use the `execute` method. This is especially useful for mutations, where there’s often no need for the query to return a value.
 
-  @send external query: (t, string, ~args: 'args=?) => promise<array<'result>> = "query"
-  @send external queryJSON: (t, string, ~args: 'args=?) => promise<string> = "queryJSON"
+await client->EdgeDB.Client.execute(`insert Movie {
+  title := "Avengers: Endgame"
+};`) */
+  @send
+  external execute: (t, string, ~args: 'args=?) => promise<unit> = "execute"
 
+  /**The `query` method always returns an array of results. It places no constraints on cardinality.
+
+```rescript
+await client->EdgeDB.Client.query(`select 2 + 2;`) // [4]
+await client->EdgeDB.Client.query(`select [1, 2, 3];`) // [[1, 2, 3]]
+await client->EdgeDB.Client.query(`select <int64>{};`) // []
+await client->EdgeDB.Client.query(`select {1, 2, 3};`) // [1, 2, 3]
+```
+ */
+  @send
+  external query: (t, string, ~args: 'args=?) => promise<array<'result>> = "query"
+
+  /**Same as `query`, but returns result as stringified JSON. */
+  @send
+  external queryJSON: (t, string, ~args: 'args=?) => promise<string> = "queryJSON"
+
+  /**If you know your query will only return a single element, you can tell EdgeDB to expect a singleton result by using the `querySingle` method. This is intended for queries that return zero or one elements. If the query returns a set with more than one elements, the Client will throw a runtime error.
+
+Note that if you’re selecting an array or tuple, the returned value may still be an array.
+
+```rescript
+await client->EdgeDB.Client.querySingle(`select 2 + 2;`) // 4
+await client->EdgeDB.Client.querySingle(`select [1, 2, 3];`) // [1, 2, 3]
+await client->EdgeDB.Client.querySingle(`select <int64>{};`) // null
+await client->EdgeDB.Client.querySingle(`select {1, 2, 3};`) // Error
+```
+*/
   @send
   external querySingle: (t, string, ~args: 'args=?) => promise<Null.t<'result>> = "querySingle"
+
+  /**Same as `querySingle`, but returns result as stringified JSON. */
   @send
   external querySingleJSON: (t, string, ~args: 'args=?) => promise<string> = "querySingleJSON"
 
-  @send @raises(JsError)
+  /**Use `queryRequiredSingle` for queries that return exactly one element. If the query returns an empty set or a set with multiple elements, the Client will throw a runtime error.
+
+await client->EdgeDB.Client.queryRequiredSingle(`select 2 + 2;`) // 4
+await client->EdgeDB.Client.queryRequiredSingle(`select [1, 2, 3];`) // [1, 2, 3]
+await client->EdgeDB.Client.queryRequiredSingle(`select <int64>{};`) // Error
+await client->EdgeDB.Client.queryRequiredSingle(`select {1, 2, 3};`) // Error
+ */
+  @send
   external queryRequiredSingle: (t, string, ~args: 'args=?) => promise<'result> =
     "queryRequiredSingle"
 
-  @send @raises(JsError)
+  /**Same as `queryRequiredSingle`, but returns result as stringified JSON. */
+  @send
   external queryRequiredSingleJSON: (t, string, ~args: 'args=?) => promise<string> =
     "queryRequiredSingleJSON"
 }
@@ -24,6 +64,11 @@ module Session = {
   type t
 }
 
+/**A JavaScript representation of an EdgeDB duration value. This class attempts to conform to the TC39 Temporal Proposal Duration type as closely as possible.
+
+No arguments may be infinite and all must have the same sign. Any non-integer arguments will be rounded towards zero.
+
+Read more: https://www.edgedb.com/docs/clients/js/reference#duration*/
 module Duration = {
   type durationLike = {
     years?: float,
@@ -44,8 +89,18 @@ module Duration = {
   @send external fromString: string => t = "from"
 }
 
+/**A client represents a connection to your database and provides methods for executing queries.
+
+In actuality, the client maintains a pool of connections under the hood. When your server is under load, queries will be run in parallel across many connections, instead of being bottlenecked by a single connection.
+
+To create a client:
+
+```rescript
+let client = EdgeDB.Client.make()
+```
+
+Read more: https://www.edgedb.com/docs/clients/js/driver#client*/
 module Client = {
-  /* Creating and configuring the client */
   type t
 
   type tlsSecurity =
@@ -145,8 +200,8 @@ module Client = {
   @send
   external withGlobals: (t, Dict.t<JSON.t>) => t = "withGlobals"
 
-  /* Status */
-  @send @raises(JsError)
+  /**If you want to explicitly ensure that the client is connected without running a query, use the `ensureConnected()` method.*/
+  @send
   external ensureConnected: t => promise<unit> = "ensureConnected"
 
   @send
