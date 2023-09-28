@@ -47,6 +47,10 @@ jobs:
           metadata-file: "dbTestProject/edgedb.toml"
           migrations-dir: "dbTestProject/dbschema/migrations"
 
+      - name: Setup EdgeDB
+        working-directory: ./dbTestProject
+        run: edgedb project init
+
       - name: Setup and build DB test project
         working-directory: ./dbTestProject
         run: npm ci && npm run build:rescript && npm run build:edgedb
