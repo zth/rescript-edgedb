@@ -44,12 +44,10 @@ jobs:
         uses: edgedb/setup-edgedb@v1
         with:
           instance-name: "dbTestProject"
-          metadata-file: "dbTestProject/edgedb.toml"
-          migrations-dir: "dbTestProject/dbschema/migrations"
 
       - name: Setup EdgeDB
         working-directory: ./dbTestProject
-        run: edgedb project init
+        run: edgedb project init --non-interactive
 
       - name: Setup and build DB test project
         working-directory: ./dbTestProject
