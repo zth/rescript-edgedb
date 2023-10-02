@@ -443,7 +443,7 @@ let getMatches = (root: string) =>
     root,
     {
       match: [%re("/[^\/]\.res$/")],
-      skip: [%re("/node_modules/"), RegExp.fromString(`dbschema\\${Path.sep}migrations`)],
+      skip: [%re("/node_modules/")],
     },
   )
 
@@ -521,6 +521,9 @@ let generateQueryFiles = async (
     } else {
       Console.log(`Generated:\n  ${generatedFiles->Array.joinWith("\n  ")}`)
     }
+
+    let filesInOutputDir =
+      filesInOutputDir->Array.filter(item => item->String.endsWith("__edgeDb.res"))
 
     if filesInOutputDir->Array.length > 0 {
       let hasLoggedCleaningUnusedFiles = ref(false)
