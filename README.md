@@ -26,7 +26,7 @@ The `rescript-edgedb` watcher needs to run for your EdgeQL to be compiled. Set u
 }
 ```
 
-> The CLI will walk upwards looking for `edgedb.toml` in order to find how to connect to your database.
+> The CLI will walk upwards looking for `edgedb.toml` in order to find how to connect to your database. So, you don't need to give the CLI any details on how to connect your database (although you can if you want).
 
 - `--src` should point to the root directory where you have ReScript files that contain `%edgeql` tags you want compiled. This directory will be searched (and watched) recursively.
 - `--output` should point to the directory where you want all _generated_ files to end up. This needs to be a directory that's part of your ReScript project, so the ReScript compiler can pick them up.
@@ -146,7 +146,7 @@ Similarily, you can design the query so that it expects there to always be exact
 
 Here's a complete list of the responses your EdgeQL queries can produce:
 
-- `promise<void>` - Nothing. No results are returned at all.
+- `void` - Nothing. No results are returned at all.
 - `array<response>` - Many. A list of all results.
 - `option<response>` - Maybe one.
 - `result<response, EdgeDB.Error.errorFromOperation>` Exactly one. Or an error.
@@ -179,7 +179,7 @@ let findMovies = %edgeql(`
     .title = <str>$movieTitle`)
 ```
 
-The `rescript-edgedb` tooling finds this `%edgeql` tag, and generates a file called `Movies__edgeDb.res` from it. That file will contain generated code and types for the `findMovies` query:
+The `rescript-edgedb` tooling finds this `%edgeql` tag, and generates a file called `Movies__edgeDb.res` from it, using code generation leveraging the official EdgeDB type generation tooling. That file will contain generated code and types for the `findMovies` query:
 
 ```rescript
 // @sourceHash 18807b4839373ee493a3aaab68766f53
@@ -232,7 +232,7 @@ Yes, you should. This ensures building the project doesn't _have_ to rely on a r
 - [x] CLI to statically prevent overfetching
 - [ ] Improve CLI docs
 - [x] Test/example project
-- [ ] Figure out publishing
+- [x] Figure out publishing
 - [ ] Generate docs using new ReScript doc generation
 
 ## Contributing
