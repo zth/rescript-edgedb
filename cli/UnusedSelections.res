@@ -13,10 +13,6 @@ let extractFileName = line => {
   }
 }
 
-let extractLineInfoRegExp = %re("/^\s*(.+)\.(.+)\.(.+)\s+(.+)$/")
-
-type extractedLineType = Args | Response
-
 type extractedLineInfo = {
   queryName: string,
   recordPath: option<array<string>>,
