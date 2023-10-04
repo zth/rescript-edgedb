@@ -179,7 +179,7 @@ let findMovies = %edgeql(`
     .title = <str>$movieTitle`)
 ```
 
-The `rescript-edgedb` tooling finds this `%edgeql` tag, and generates a file called `Movies__edgeDb.res` from it, using code generation leveraging the official EdgeDB type generation tooling. That file will contain generated code and types for the `findMovies` query:
+The `rescript-edgedb` tooling finds this `%edgeql` tag, and generates a file called `Movies__edgeql.res` from it, using code generation leveraging the official EdgeDB type generation tooling. That file will contain generated code and types for the `findMovies` query:
 
 ```rescript
 // @sourceHash 18807b4839373ee493a3aaab68766f53

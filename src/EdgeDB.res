@@ -70,6 +70,7 @@ No arguments may be infinite and all must have the same sign. Any non-integer ar
 
 Read more: https://www.edgedb.com/docs/clients/js/reference#duration*/
 module Duration = {
+  @live
   type durationLike = {
     years?: float,
     months?: float,
@@ -109,6 +110,7 @@ module Client = {
     | @as("strict") Strict
     | @as("default") Default
 
+  @live
   type connectConfig = {
     dsn?: string,
     instanceName?: string,
@@ -128,9 +130,11 @@ module Client = {
     waitUntilAvailable?: Duration.t,
     logging?: bool,
   }
+  @live
   type clientOptions = {concurrency?: int}
   type connectOptions = {...clientOptions, ...connectConfig}
 
+  @live
   type resolvedConnectConfig = {
     address: (string, float),
     database: string,
@@ -142,12 +146,15 @@ module Client = {
     waitUntilAvailable: float,
   }
 
+  @live
   type partiallyNormalizedConfig = {
     connectionParams: resolvedConnectConfig,
     inProject: unit => promise<bool>,
     fromProject: bool,
     fromEnv: bool,
   }
+
+  @live
   type normalizedConnectConfig = {
     ...partiallyNormalizedConfig,
     connectTimeout?: float,
@@ -156,9 +163,10 @@ module Client = {
 
   @module("edgedb") external make: (~options: connectOptions=?) => t = "createClient"
 
-  @unboxed
+  @unboxed @live
   type isolationLevel = | @as("SERIALIZABLE") Serializable
 
+  @live
   type simpleTransactionOptions = {
     isolation?: isolationLevel,
     readonly?: bool,
@@ -168,6 +176,7 @@ module Client = {
   @send
   external withTransactionOptions: (t, simpleTransactionOptions) => t = "withTransactionOptions"
 
+  @live
   type simpleRetryOptions = {
     attempts?: int,
     /** (attempt: int) => float */
@@ -183,8 +192,10 @@ module Client = {
   @send
   external withModuleAliases: (t, Dict.t<string>) => t = "withModuleAliases"
 
+  @live
   type allowBareDdl = AlwaysAllow | NeverAllow
 
+  @live
   type simpleConfig = {
     @as("session_idle_transaction_timeout") sessionIdleTransactionTimeout?: Duration.t,
     @as("query_execution_timeout") queryExecutionTimeout?: Duration.t,
@@ -238,22 +249,26 @@ module Client = {
 }
 
 module Error = {
+  @live
   type binaryProtocolError =
     | @as(0x03_01_00_00) BinaryProtocolError
     | @as(0x03_01_00_01) UnsupportedProtocolVersionError
     | @as(0x03_01_00_02) TypeSpecNotFoundError
     | @as(0x03_01_00_03) UnexpectedMessageError
 
+  @live
   type inputDataError =
     | @as(0x03_02_00_00) InputDataError
     | @as(0x03_02_01_00) ParameterTypeMismatchError
     | @as(0x03_02_02_00) StateMismatchError
 
+  @live
   type capabilityError =
     | @as(0x03_04_00_00) CapabilityError
     | @as(0x03_04_01_00) UnsupportedCapabilityError
     | @as(0x03_04_02_00) DisabledCapabilityError
 
+  @live
   type protocolError =
     | @as(0x03_00_00_00) ProtocolError
     | @as(0x03_03_00_00) ResultCardinalityMismatchError
@@ -261,19 +276,23 @@ module Error = {
     | ...inputDataError
     | ...capabilityError
 
+  @live
   type invalidSyntaxError =
     | @as(0x04_01_00_00) InvalidSyntaxError
     | @as(0x04_01_01_00) EdgeQLSyntaxError
     | @as(0x04_01_02_00) SchemaSyntaxError
     | @as(0x04_01_03_00) GraphQLSyntaxError
 
+  @live
   type invalidTargetError =
     | @as(0x04_02_01_00) InvalidTargetError
     | @as(0x04_02_01_01) InvalidLinkTargetError
     | @as(0x04_02_01_02) InvalidPropertyTargetError
 
+  @live
   type invalidTypeError = | @as(0x04_02_00_00) InvalidTypeError | ...invalidTargetError
 
+  @live
   type invalidReferenceError =
     | @as(0x04_03_00_00) InvalidReferenceError
     | @as(0x04_03_00_01) UnknownModuleError
@@ -283,6 +302,7 @@ module Error = {
     | @as(0x04_03_00_05) UnknownDatabaseError
     | @as(0x04_03_00_06) UnknownParameterError
 
+  @live
   type invalidDefinitionError =
     | @as(0x04_05_01_00) InvalidDefinitionError
     | @as(0x04_05_01_01) InvalidModuleDefinitionError
@@ -296,6 +316,7 @@ module Error = {
     | @as(0x04_05_01_09) InvalidConstraintDefinitionError
     | @as(0x04_05_01_0a) InvalidCastDefinitionError
 
+  @live
   type duplicateDefinitionError =
     | @as(0x04_05_02_00) DuplicateDefinitionError
     | @as(0x04_05_02_01) DuplicateModuleDefinitionError
@@ -310,20 +331,24 @@ module Error = {
     | @as(0x04_05_02_0a) DuplicateCastDefinitionError
     | @as(0x04_05_02_0b) DuplicateMigrationError
 
+  @live
   type schemaDefinitionError =
     | @as(0x04_05_00_00) SchemaDefinitionError
     | ...invalidDefinitionError
     | ...duplicateDefinitionError
 
+  @live
   type transactionTimeoutError =
     | @as(0x04_06_0a_00) TransactionTimeoutError | @as(0x04_06_0a_01) IdleTransactionTimeoutError
 
+  @live
   type sessionTimeoutError =
     | @as(0x04_06_00_00) SessionTimeoutError
     | @as(0x04_06_01_00) IdleSessionTimeoutError
     | @as(0x04_06_02_00) QueryTimeoutError
     | ...transactionTimeoutError
 
+  @live
   type queryError =
     | @as(0x04_00_00_00) QueryError
     | @as(0x04_04_00_00) SchemaError
@@ -333,6 +358,7 @@ module Error = {
     | ...schemaDefinitionError
     | ...sessionTimeoutError
 
+  @live
   type invalidValueError =
     | @as(0x05_01_00_00) InvalidValueError
     | @as(0x05_01_00_01) DivisionByZeroError
@@ -340,19 +366,23 @@ module Error = {
     | @as(0x05_01_00_03) AccessPolicyError
     | @as(0x05_01_00_04) QueryAssertionError
 
+  @live
   type integrityError =
     | @as(0x05_02_00_00) IntegrityError
     | @as(0x05_02_00_01) ConstraintViolationError
     | @as(0x05_02_00_02) CardinalityViolationError
     | @as(0x05_02_00_03) MissingRequiredError
 
+  @live
   type transactionConflictError =
     | @as(0x05_03_01_00) TransactionConflictError
     | @as(0x05_03_01_01) TransactionSerializationError
     | @as(0x05_03_01_02) TransactionDeadlockError
 
+  @live
   type transactionError = | @as(0x05_03_00_00) TransactionError | ...transactionConflictError
 
+  @live
   type executionError =
     | @as(0x05_00_00_00) ExecutionError
     | @as(0x05_04_00_00) WatchError
@@ -360,34 +390,43 @@ module Error = {
     | ...integrityError
     | ...transactionError
 
+  @live
   type accessError = | @as(0x07_00_00_00) AccessError | @as(0x07_01_00_00) AuthenticationError
 
+  @live
   type availabilityError =
     | @as(0x08_00_00_00) AvailabilityError | @as(0x08_00_00_01) BackendUnavailableError
 
+  @live
   type backendError =
     | @as(0x09_00_00_00) BackendError | @as(0x09_00_01_00) UnsupportedBackendFeatureError
 
+  @live
   type logMessage = | @as(0xf0_00_00_00) LogMessage | @as(0xf0_01_00_00) WarningMessage
 
+  @live
   type clientConnectionFailedError =
     | @as(0xff_01_01_00) ClientConnectionFailedError
     | @as(0xff_01_01_01) ClientConnectionFailedTemporarilyError
 
+  @live
   type clientConnectionError =
     | ...clientConnectionFailedError
     | @as(0xff_01_00_00) ClientConnectionError
     | @as(0xff_01_02_00) ClientConnectionTimeoutError
     | @as(0xff_01_03_00) ClientConnectionClosedError
 
+  @live
   type queryArgumentError =
     | @as(0xff_02_01_00) QueryArgumentError
     | @as(0xff_02_01_01) MissingArgumentError
     | @as(0xff_02_01_02) UnknownArgumentError
     | @as(0xff_02_01_03) InvalidArgumentError
 
+  @live
   type interfaceError = | @as(0xff_02_00_00) InterfaceError | ...queryArgumentError
 
+  @live
   type clientError =
     | @as(0xff_00_00_00) ClientError
     | @as(0xff_03_00_00) NoDataError
@@ -395,6 +434,7 @@ module Error = {
     | ...clientConnectionError
     | ...interfaceError
 
+  @live
   type t =
     | @as(0x01_00_00_00) InternalServerError
     | @as(0x02_00_00_00) UnsupportedFeatureError
@@ -408,6 +448,7 @@ module Error = {
     | ...clientError
     | ...protocolError
 
+  @live
   type edgeDbErrorClass = {code: t}
 
   type errorFromOperation = EdgeDbError(edgeDbErrorClass) | GenericError(Exn.t)
@@ -431,6 +472,7 @@ module Error = {
 
 module QueryHelpers = {
   /** Returns all found items as an array. */
+  @live
   let many = (client, query, ~args=?) => Client.query(client, query, ~args)
 
   /** Returns a single item, if one was found. */
@@ -447,6 +489,7 @@ module QueryHelpers = {
     }
 
   /** Assumes exactly one item is going to be found, and errors if that's not the case. */
+  @live
   let singleRequired = async (client, query, ~args=?) =>
     switch await Client.queryRequiredSingle(client, query, ~args) {
     | v => Ok(v)
@@ -456,9 +499,11 @@ module QueryHelpers = {
 
 module TransactionHelpers = {
   /** Returns all found items as an array. */
+  @live
   let many = (client, query, ~args=?) => Transaction.query(client, query, ~args)
 
   /** Returns a single item, if one was found. */
+  @live
   let single = async (client, query, ~args=?, ~onError=?) =>
     switch await Transaction.querySingle(client, query, ~args) {
     | Value(v) => Some(v)
@@ -472,6 +517,7 @@ module TransactionHelpers = {
     }
 
   /** Assumes exactly one item is going to be found, and errors if that's not the case. */
+  @live
   let singleRequired = async (client, query, ~args=?) =>
     switch await Transaction.queryRequiredSingle(client, query, ~args) {
     | v => Ok(v)

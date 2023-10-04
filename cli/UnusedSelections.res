@@ -1,6 +1,6 @@
 let adapter = EdgeDbGenerator__Utils.adapter
 
-let extractFileNameRegExp = %re("/\/([^\/]*?)__edgeDb\.\w+\"/")
+let extractFileNameRegExp = %re("/\/([^\/]*?)__edgeql\.\w+\"/")
 
 let extractFileName = line => {
   if line->String.startsWith("  File") {
@@ -12,10 +12,6 @@ let extractFileName = line => {
     None
   }
 }
-
-let extractLineInfoRegExp = %re("/^\s*(.+)\.(.+)\.(.+)\s+(.+)$/")
-
-type extractedLineType = Args | Response
 
 type extractedLineInfo = {
   queryName: string,
