@@ -14,9 +14,37 @@ let _ = movies->Array.forEach(movie => {
 let singleMovie = await client->Movies.movieByTitle(~title="The Great Adventure")
 
 let _ = switch singleMovie {
-| Some({title, actors: [{id, numberOfPets}]}) =>
+| Some({
+    title,
+    actors: [
+      {
+        id,
+        numberOfPets,
+        typesDump: Value({
+          date,
+          localDateTime,
+          localDate,
+          relativeDuration,
+          duration,
+          dateDuration,
+          localTime,
+          json,
+        }),
+      },
+    ],
+  }) =>
   let _id = id
   let _title = title
   let _numberOfPets = numberOfPets
+  Console.log((
+    date,
+    localDateTime,
+    localDate,
+    relativeDuration,
+    duration,
+    dateDuration,
+    localTime,
+    json,
+  ))
 | _ => ()
 }

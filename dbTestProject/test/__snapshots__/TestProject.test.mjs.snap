@@ -56,7 +56,8 @@ exports[`fetching data fetching single movie 1`] = `
     {
       "id": "<id>",
       "name": "John Doe",
-      "numberOfPets": 2
+      "numberOfPets": 2,
+      "typesDump": null
     }
   ]
 }"
@@ -77,18 +78,4 @@ File "Movies":
     - actors: name
     - id
 "
-`;
-
-exports[`fetching data fetching single movie 2`] = `
-"{
-  "id": "<id>",
-  "title": "The Great Adventure",
-  "actors": [
-    {
-      "id": "<id>",
-      "name": "John Doe",
-      "numberOfPets": 2
-    }
-  ]
-}"
 `;
