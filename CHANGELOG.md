@@ -1,5 +1,7 @@
 # master
 
+# 0.3.0
+
 - Don't pick up %edgeql in single line comments.
 - Support more complex types in type generation.
 
