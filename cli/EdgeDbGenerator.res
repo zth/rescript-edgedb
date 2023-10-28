@@ -77,6 +77,9 @@ module Codec = {
   @module("edgedb/dist/codecs/numbers.js")
   external int32Codec: t = "Int32Codec"
 
+  @module("edgedb/dist/codecs/json.js")
+  external jsonCodec: t = "JSONCodec"
+
   @module("edgedb/dist/codecs/numerics.js")
   external bigintCodec: t = "BigIntCodec"
 
@@ -226,11 +229,24 @@ module AnalyzeQuery = {
         } else if codec->is(int16Codec) || codec->is(int32Codec) {
           "int"
         } else if codec->is(bigintCodec) {
-          "bigint"
+          "BigInt.t"
+        } else if codec->is(jsonCodec) {
+          "JSON.t"
         } else {
           switch codec->tsType {
           | "number" => "float"
           | "boolean" => "bool"
+          | "Date" => "Date.t"
+          | ("LocalDateTime"
+            | "LocalDate"
+            | "RelativeDuration"
+            | "ConfigMemory"
+            | "Duration"
+            | "DateDuration"
+            | "LocalTime") as dataType =>
+            `EdgeDB.DataTypes.${dataType}.t`
+          | tsType if tsType->String.charAt(0)->String.toUpperCase === tsType->String.charAt(0) =>
+            `${tsType}.t`
           | tsType => tsType
           }
         }

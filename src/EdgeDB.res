@@ -524,3 +524,145 @@ module TransactionHelpers = {
     | exception Exn.Error(err) => Error(err->Error.fromExn)
     }
 }
+
+module DataTypes = {
+  module LocalDate = {
+    type months =
+      | @as(1) January
+      | @as(2) February
+      | @as(3) March
+      | @as(4) April
+      | @as(5) May
+      | @as(6) June
+      | @as(7) July
+      | @as(8) August
+      | @as(9) September
+      | @as(10) October
+      | @as(11) November
+      | @as(12) December
+
+    type dayOfWeek =
+      | @as(1) Monday
+      | @as(2) Tuesday
+      | @as(3) Wednesday
+      | @as(4) Thursday
+      | @as(5) Friday
+      | @as(6) Saturday
+      | @as(7) Sunday
+
+    type t
+
+    @get external year: t => int = "year"
+    @get external months: t => months = "month"
+    @get external day: t => int = "day"
+    @get external dayOfWeek: t => dayOfWeek = "dayOfWeek"
+    @get external dayOfYear: t => int = "dayOfYear"
+    @get external daysInWeek: t => int = "daysInWeek"
+    @get external daysInMonth: t => int = "daysInMonth"
+    @get external daysInYear: t => int = "daysInYear"
+    @get external monthsInYear: t => int = "monthsInYear"
+    @get external inLeapYear: t => bool = "inLeapYear"
+    @send external toString: t => string = "toString"
+    @send external toJSON: t => string = "toJSON"
+  }
+
+  module LocalDateTime = {
+    type t
+
+    @get external year: t => int = "year"
+    @get external months: t => LocalDate.months = "month"
+    @get external day: t => int = "day"
+    @get external dayOfWeek: t => LocalDate.dayOfWeek = "dayOfWeek"
+    @get external dayOfYear: t => int = "dayOfYear"
+    @get external daysInWeek: t => int = "daysInWeek"
+    @get external daysInMonth: t => int = "daysInMonth"
+    @get external daysInYear: t => int = "daysInYear"
+    @get external monthsInYear: t => int = "monthsInYear"
+    @get external inLeapYear: t => bool = "inLeapYear"
+
+    @get external hour: t => int = "hour"
+    @get external minute: t => int = "minute"
+    @get external second: t => int = "second"
+    @get external millisecond: t => int = "millisecond"
+    @get external microsecond: t => int = "microsecond"
+    @get external nanosecond: t => int = "nanosecond"
+
+    @send external toString: t => string = "toString"
+    @send external toJSON: t => string = "toJSON"
+  }
+
+  module LocalTime = {
+    type t
+
+    @get external hour: t => int = "hour"
+    @get external minute: t => int = "minute"
+    @get external second: t => int = "second"
+    @get external millisecond: t => int = "millisecond"
+    @get external microsecond: t => int = "microsecond"
+    @get external nanosecond: t => int = "nanosecond"
+
+    @send external toString: t => string = "toString"
+    @send external toJSON: t => string = "toJSON"
+  }
+
+  module Duration = {
+    type t
+
+    @get external years: t => float = "years"
+    @get external months: t => float = "months"
+    @get external weeks: t => float = "weeks"
+    @get external days: t => float = "days"
+    @get external hours: t => float = "hours"
+    @get external minutes: t => float = "minutes"
+    @get external seconds: t => float = "seconds"
+    @get external milliseconds: t => float = "milliseconds"
+    @get external microseconds: t => float = "microseconds"
+    @get external sign: t => float = "sign"
+    @get external blank: t => bool = "blank"
+
+    @send external toString: t => string = "toString"
+    @send external toJSON: t => string = "toJSON"
+  }
+
+  module DateDuration = {
+    type t
+
+    @get external years: t => float = "years"
+    @get external months: t => float = "months"
+    @get external weeks: t => float = "weeks"
+    @get external days: t => float = "days"
+
+    @send external toString: t => string = "toString"
+    @send external toJSON: t => string = "toJSON"
+  }
+
+  module RelativeDuration = {
+    type t
+
+    @get external years: t => float = "years"
+    @get external months: t => float = "months"
+    @get external weeks: t => float = "weeks"
+    @get external days: t => float = "days"
+    @get external hours: t => float = "hours"
+    @get external minutes: t => float = "minutes"
+    @get external seconds: t => float = "seconds"
+    @get external milliseconds: t => float = "milliseconds"
+    @get external microseconds: t => float = "microseconds"
+
+    @send external toString: t => string = "toString"
+    @send external toJSON: t => string = "toJSON"
+  }
+
+  module ConfigMemory = {
+    type t
+
+    @get external bytes: t => float = "bytes"
+    @get external bytesBigInt: t => BigInt.t = "bytesBigInt"
+    @get external kibibytes: t => float = "kibibytes"
+    @get external mebibytes: t => float = "mebibytes"
+    @get external gibibytes: t => float = "gibibytes"
+    @get external tebibytes: t => float = "tebibytes"
+    @get external pebibytes: t => float = "pebibytes"
+    @send external toString: t => string = "toString"
+  }
+}
