@@ -12,6 +12,13 @@ let allMovies = client => {
     } order by .title
     `)
 
+  // let query = %edgeql(`
+  //# @name allMovies2
+  //select Movie {
+  //  id
+  //} order by .title
+  //`)
+
   client->query
 }
 

@@ -7,7 +7,7 @@
     "test": "bun test test/",
     "build": "npm run build:edgedb && npm run build:rescript",
     "build:rescript": "rescript build -with-deps",
-    "build:edgedb": "rescript-edgedb generate --output ./src/__generated__ --src ./src",
+    "build:edgedb": "../cli/Cli.mjs generate --output ./src/__generated__ --src ./src",
     "watch:edgedb": "npm run build:edgedb -- --watch"
   },
   "keywords": [],
@@ -17,6 +17,6 @@
     "@rescript/core": "0.5.0",
     "rescript": "11.0.0-rc.3",
     "rescript-edgedb": "../",
-    "rescript-embed-lang": "0.2.0"
+    "rescript-embed-lang": "0.2.2"
   }
 }
