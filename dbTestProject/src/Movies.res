@@ -31,7 +31,17 @@ let movieByTitle = (client, ~title) => {
       actors: {
           id,
           name,
-          numberOfPets := count(.pets)
+          numberOfPets := count(.pets),
+          typesDump: {
+            date,
+            localDateTime,
+            localDate,
+            relativeDuration,
+            duration,
+            dateDuration,
+            localTime,
+            json
+          }
       }
     } 
       filter .title = <str>$title

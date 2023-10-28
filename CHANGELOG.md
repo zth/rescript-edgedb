@@ -1,5 +1,8 @@
 # master
 
+- Don't pick up %edgeql in single line comments.
+- Support more complex types in type generation.
+
 # 0.2.0
 
 - Move to use `rescript-embed-lang` utils for building the CLI.

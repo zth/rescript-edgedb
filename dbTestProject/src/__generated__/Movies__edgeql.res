@@ -1,4 +1,4 @@
-// @sourceHash 3d7911e6776c791d6a1b2296a1bd21b2
+// @sourceHash ea83816a5d865506994a6e6ac667a3d6
 
 module AllMovies = {
   let queryText = `# @name allMovies
@@ -41,7 +41,17 @@ module MovieByTitle = {
         actors: {
             id,
             name,
-            numberOfPets := count(.pets)
+            numberOfPets := count(.pets),
+            typesDump: {
+              date,
+              localDateTime,
+              localDate,
+              relativeDuration,
+              duration,
+              dateDuration,
+              localTime,
+              json
+            }
         }
       } 
         filter .title = <str>$title
@@ -51,10 +61,22 @@ module MovieByTitle = {
       title: string,
     }
   
+    type response__actors__typesDump = {
+      date: Null.t<Date.t>,
+      localDateTime: Null.t<EdgeDB.DataTypes.LocalDateTime.t>,
+      localDate: Null.t<EdgeDB.DataTypes.LocalDate.t>,
+      relativeDuration: Null.t<EdgeDB.DataTypes.RelativeDuration.t>,
+      duration: Null.t<EdgeDB.DataTypes.Duration.t>,
+      dateDuration: Null.t<EdgeDB.DataTypes.DateDuration.t>,
+      localTime: Null.t<EdgeDB.DataTypes.LocalTime.t>,
+      json: Null.t<JSON.t>,
+    }
+  
     type response__actors = {
       id: string,
       name: string,
       numberOfPets: float,
+      typesDump: Null.t<response__actors__typesDump>,
     }
   
     type response = {
