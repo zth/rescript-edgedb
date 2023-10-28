@@ -7,7 +7,7 @@
     "test": "bun test test/",
     "build": "npm run build:edgedb && npm run build:rescript",
     "build:rescript": "rescript build -with-deps",
-    "build:edgedb": "../cli/Cli.mjs generate --output ./src/__generated__ --src ./src",
+    "build:edgedb": "../dist/Cli.js generate --output ./src/__generated__ --src ./src",
     "watch:edgedb": "npm run build:edgedb -- --watch"
   },
   "keywords": [],
