@@ -11,6 +11,18 @@ let _ = movies->Array.forEach(movie => {
   })
 })
 
+let moviesNested = await client->Movies.Nested.query
+
+let _ = moviesNested->Array.forEach(movie => {
+  let _id = movie.id
+  let _title = movie.title
+  let _actors = movie.actors->Array.forEach(actor => {
+    let _id = actor.id
+    let _name = actor.name
+    let _numberOfPets = actor.numberOfPets
+  })
+})
+
 let singleMovie = await client->Movies.movieByTitle(~title="The Great Adventure")
 
 let _ = switch singleMovie {
