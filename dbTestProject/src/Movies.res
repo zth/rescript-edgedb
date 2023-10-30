@@ -22,6 +22,21 @@ let allMovies = client => {
   client->query
 }
 
+module Nested = {
+  let query = %edgeql(`
+    # @name allMoviesNested
+    select Movie {
+      id,
+      title,
+      actors: {
+          id,
+          name,
+          numberOfPets := count(.pets)
+      }
+    } order by .title
+    `)
+}
+
 let movieByTitle = (client, ~title) => {
   let query = %edgeql(`
     # @name movieByTitle

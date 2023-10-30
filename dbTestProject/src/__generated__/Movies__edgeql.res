@@ -1,7 +1,40 @@
-// @sourceHash ea83816a5d865506994a6e6ac667a3d6
+// @sourceHash 430c5e4f4d671de90827444ead9bca8e
 
 module AllMovies = {
   let queryText = `# @name allMovies
+      select Movie {
+        id,
+        title,
+        actors: {
+            id,
+            name,
+            numberOfPets := count(.pets)
+        }
+      } order by .title`
+  
+    type response__actors = {
+      id: string,
+      name: string,
+      numberOfPets: float,
+    }
+  
+    type response = {
+      id: string,
+      title: string,
+      actors: array<response__actors>,
+    }
+  
+  let query = (client: EdgeDB.Client.t): promise<array<response>> => {
+    client->EdgeDB.QueryHelpers.many(queryText)
+  }
+  
+  let transaction = (transaction: EdgeDB.Transaction.t): promise<array<response>> => {
+    transaction->EdgeDB.TransactionHelpers.many(queryText)
+  }
+}
+
+module AllMoviesNested = {
+  let queryText = `# @name allMoviesNested
       select Movie {
         id,
         title,
