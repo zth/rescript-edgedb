@@ -1,5 +1,9 @@
 # master
 
+# 0.3.1
+
+- Fix bug with not findings `let` bindings in nested modules.
+
 # 0.3.0
 
 - Don't pick up %edgeql in single line comments.
