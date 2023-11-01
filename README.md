@@ -53,7 +53,7 @@ let findMovies = %edgeql(`
 Executing the query is done by passing it the `client`, and arguments if it takes any.
 
 ```rescript
-let findMovie = %edgeql(`
+let findMovies = %edgeql(`
     # @name findMovies
     select Movie {
         title,
