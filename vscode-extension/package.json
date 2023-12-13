@@ -1,7 +1,7 @@
 {
   "name": "vscode-rescript-edgedb",
   "description": "Improve quality-of-life of using EdgeDB in ReScript with VSCode.",
-  "version": "0.2.1",
+  "version": "0.1.0",
   "main": "./build/extension.js",
   "engines": {
     "vscode": "^1.77.0"
