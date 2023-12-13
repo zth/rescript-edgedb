@@ -183,6 +183,7 @@ The `rescript-edgedb` tooling finds this `%edgeql` tag, and generates a file cal
 
 ```rescript
 // @sourceHash 18807b4839373ee493a3aaab68766f53
+// @generated This file is generated automatically by rescript-edgedb, do not edit manually
 module FindMoviesQuery = {
   let queryText = `select Movie {
         title,

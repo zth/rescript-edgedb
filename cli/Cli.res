@@ -24,7 +24,78 @@ let usage = `Usage:
 
 type config = {client: EdgeDB.Client.t}
 
+type errorInFile = {
+  startLoc: RescriptEmbedLang.loc,
+  endLoc: RescriptEmbedLang.loc,
+  errorMessage: string,
+}
+
+let isInConfigDir = async () => {
+  let bsconfig = Path.resolve([adapter.process.cwd(), "bsconfig.json"])
+  let rescriptJson = Path.resolve([adapter.process.cwd(), "rescript.json"])
+
+  try {
+    await adapter.fs.access(bsconfig)
+    true
+  } catch {
+  | Exn.Error(_) =>
+    try {
+      await adapter.fs.access(rescriptJson)
+      true
+    } catch {
+    | Exn.Error(_) => false
+    }
+  }
+}
+
 let main = async () => {
+  let errors = Map.make()
+
+  let syncErrors = async () => {
+    let isInConfigDir = await isInConfigDir()
+
+    if isInConfigDir {
+      let errorsFile = Path.resolve([adapter.process.cwd(), "lib", "bs", ".generator.edgeql.log"])
+      NodeJs.Fs.writeFileSync(
+        errorsFile,
+        errors
+        ->Map.entries
+        ->Iterator.toArray
+        ->Array.map(((filePath, errorMap)) =>
+          {
+            "filePath": filePath,
+            "errors": errorMap->Dict.valuesToArray,
+          }
+        )
+        ->JSON.stringifyAny
+        ->Option.getWithDefault("")
+        ->NodeJs.Buffer.fromString,
+      )
+    }
+  }
+
+  let pruneErrorsForModuleInFile = (~path, ~moduleName) =>
+    switch errors->Map.get(path) {
+    | None => ()
+    | Some(fileErrors) =>
+      switch moduleName {
+      | None => ()
+      | Some(moduleName) => fileErrors->Dict.delete(moduleName)
+      }
+    }
+
+  let setErrorForModuleInFile = (~path, ~error: errorInFile, ~moduleName) =>
+    switch moduleName {
+    | Some(moduleName) =>
+      switch errors->Map.get(path) {
+      | None =>
+        let fileErrors = Dict.fromArray([(moduleName, error)])
+        errors->Map.set(path, fileErrors)
+      | Some(fileErrors) => fileErrors->Dict.set(moduleName, error)
+      }
+    | None => ()
+    }
+
   let emitter = RescriptEmbedLang.make(
     ~extensionPattern=FirstClass("edgeql"),
     ~cliHelpText=usage,
@@ -98,13 +169,9 @@ let main = async () => {
       switch command {
       | "unused-selections" =>
         let ci = args->RescriptEmbedLang.CliArgs.hasArg("--ci")
-        let bsconfig = Path.resolve([adapter.process.cwd(), "bsconfig.json"])
-        try {
-          // Try to access the directory
-          await adapter.fs.access(bsconfig)
-        } catch {
-        | Exn.Error(_) =>
-          Console.error(`Could not find bsconfig.json. This command needs to run in the same directory as bsconfig.json.`)
+
+        if !(await isInConfigDir()) {
+          Console.error(`Could not find bsconfig.json or rescript.json. This command needs to run in the same directory as bsconfig.json or rescript.json.`)
           adapter.process->EdgeDbGenerator__Utils.Adapter.exit(1)
         }
 
@@ -120,7 +187,7 @@ let main = async () => {
       | _ => ()
       }
     },
-    ~generate=async ({config, content}) => {
+    ~generate=async ({config, content, path, location}) => {
       open EdgeDbGenerator
 
       let moduleName =
@@ -132,7 +199,99 @@ let main = async () => {
         ->Array.get(0)
         ->Option.map(EdgeDbGenerator__Utils.capitalizeString)
         ->Option.map(String.trim)
-      let types = await config.client->AnalyzeQuery.analyzeQuery(content, ~path="")
+
+      let types = switch await config.client->AnalyzeQuery.analyzeQuery(content, ~path="") {
+      | Ok(types) =>
+        pruneErrorsForModuleInFile(~path, ~moduleName)
+        types
+      | Error(errorMessage) =>
+        let error = Utils.Errors.extractFromString(
+          errorMessage,
+          ~startLoc=(location.start :> Utils.Errors.loc),
+        )
+
+        switch error {
+        | None =>
+          /* Set error loc to generic error */
+          let lines = content->String.split("\n")
+          let lineCount = ref(0)
+          let break = ref(false)
+          let loc = ref(None)
+          while !break.contents {
+            let currentLineCount = lineCount.contents
+            lineCount := currentLineCount + 1
+            let line = lines->Array.get(currentLineCount)->Option.getWithDefault("")
+            if line->String.includes("@name") {
+              switch line->String.split("# @name ") {
+              | [before, _after] =>
+                let col = before->String.length + "# @name "->String.length
+                loc :=
+                  Some((
+                    {
+                      Utils.Errors.line: currentLineCount,
+                      col,
+                    },
+                    {
+                      Utils.Errors.line: currentLineCount,
+                      col: line->String.length,
+                    },
+                  ))
+              | _ => ()
+              }
+            }
+
+            if lineCount.contents > lines->Array.length {
+              break := true
+            }
+          }
+
+          switch loc.contents {
+          | None => ()
+          | Some((startLoc, endLoc)) =>
+            setErrorForModuleInFile(
+              ~path,
+              ~error={
+                errorMessage,
+                startLoc: {
+                  line: startLoc.line + location.start.line,
+                  col: startLoc.col,
+                },
+                endLoc: {
+                  line: endLoc.line + location.start.line,
+                  col: endLoc.col,
+                },
+              },
+              ~moduleName,
+            )
+          }
+        | Some(error) =>
+          setErrorForModuleInFile(
+            ~path,
+            ~error={
+              errorMessage: error.text,
+              startLoc: {
+                line: error.start.line,
+                col: error.start.col,
+              },
+              endLoc: {
+                line: error.end.line,
+                col: error.end.col,
+              },
+            },
+            ~moduleName,
+          )
+        }
+
+        let distinctTypes = Set.make()
+        distinctTypes->Set.add("type lookAboveForDetails = this_query_has_EdgeQL_errors")
+        {
+          args: "unit",
+          result: "",
+          cardinality: ONE,
+          query: `/*\n${errorMessage}\n*/`,
+          distinctTypes,
+        }
+      }
 
       let fileOutput = []
       let (method, returnType, extraInFnArgs, extraInFnApply) = switch types.cardinality {
@@ -167,6 +326,10 @@ let transaction = (transaction: EdgeDB.Transaction.t${hasArgs
 }`,
       )
       let content = fileOutput->Array.joinWith("")
+
+      // Sync errors
+      syncErrors()->Promise.done
+
       switch moduleName {
       | Some(moduleName) => Ok({RescriptEmbedLang.WithModuleName({content, moduleName})})
       | None => Error("Could not find query name.")
