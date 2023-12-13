@@ -15,15 +15,15 @@ export async function activate(context: ExtensionContext) {
   let currentWorkspacePath = workspace.workspaceFolders?.[0].uri.fsPath;
   if (currentWorkspacePath == null) throw new Error("Init failed.");
 
-  const files = await workspace.findFiles(
-    "**/.generator.edgeql.log",
+  const rootFiles = await workspace.findFiles(
+    "**/{bsconfig,rescript}.json",
     "**/node_modules/**",
     10
   );
 
-  const watchers = files
+  const watchers = rootFiles
     .reduce((uniquePaths: Array<string>, filePath) => {
-      const dir = path.dirname(filePath.fsPath);
+      const dir = path.resolve(path.dirname(filePath.fsPath), "lib/bs");
 
       if (!uniquePaths.includes(dir)) {
         uniquePaths.push(dir);
