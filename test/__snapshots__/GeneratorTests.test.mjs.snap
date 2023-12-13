@@ -3,12 +3,12 @@
 exports[`extracting errors Extracting errors #unexpectedWithTokenHint 1`] = `
 {
   "end": {
-    "col": 13,
-    "line": 16,
+    "col": 12,
+    "line": 15,
   },
   "start": {
-    "col": 7,
-    "line": 16,
+    "col": 6,
+    "line": 15,
   },
   "text": 
 "Unexpected token: <Token IDENT "actors">
@@ -20,12 +20,12 @@ Hint: It appears that a ',' is missing in a shape before 'actors'"
 exports[`extracting errors Extracting errors #typeOrAliasDoesNotExist 1`] = `
 {
   "end": {
-    "col": 17,
-    "line": 21,
+    "col": 16,
+    "line": 20,
   },
   "start": {
-    "col": 16,
-    "line": 21,
+    "col": 15,
+    "line": 20,
   },
   "text": 
 "object type or alias 'default::a' does not exist
@@ -37,12 +37,12 @@ Hint: did you mean '.id'?"
 exports[`extracting errors Extracting errors #objectTypeHasNoProp 1`] = `
 {
   "end": {
-    "col": 22,
-    "line": 21,
+    "col": 21,
+    "line": 20,
   },
   "start": {
-    "col": 16,
-    "line": 21,
+    "col": 15,
+    "line": 20,
   },
   "text": "object type 'default::Movie' has no link or property 'TITLE'",
 }
@@ -51,12 +51,12 @@ exports[`extracting errors Extracting errors #objectTypeHasNoProp 1`] = `
 exports[`extracting errors Extracting errors #unexpected 1`] = `
 {
   "end": {
-    "col": 17,
-    "line": 21,
+    "col": 16,
+    "line": 20,
   },
   "start": {
-    "col": 7,
-    "line": 21,
+    "col": 6,
+    "line": 20,
   },
   "text": "Unexpected 'orderaaaaa'",
 }
