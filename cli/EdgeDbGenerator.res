@@ -285,7 +285,10 @@ module AnalyzeQuery = {
     }
   }
 
-  let analyzeQuery = async (client: EdgeDB.Client.t, query: string, ~path): QueryType.t => {
+  let analyzeQuery = async (client: EdgeDB.Client.t, query: string, ~path): result<
+    QueryType.t,
+    string,
+  > => {
     let pool = client->getPool
     let holder = await pool->BaseClientPool.acquireHolder(BaseClientPool.getDefaultOptions())
     let errorMessage = ref(None)
@@ -332,26 +335,19 @@ module AnalyzeQuery = {
           distinctTypes,
         },
       )->generateSetType(cardinality)
-      {
+      Ok({
         result,
         args,
         cardinality,
         query,
         distinctTypes,
-      }
+      })
     | _ =>
-      let distinctTypes = Set.make()
-      distinctTypes->Set.add("type lookAboveForDetails = this_query_has_EdgeQL_errors")
-      {
-        args: "unit",
-        result: "",
-        cardinality: ONE,
-        query: switch errorMessage.contents {
-        | None => "/* This query has an unknown EdgeDB error. Please check the query and recompile. */"
-        | Some(errorMessage) => `/*\n${errorMessage}\n*/`
-        },
-        distinctTypes,
-      }
+      Error(
+        errorMessage.contents->Option.getWithDefault(
+          "This query has an unknown EdgeDB error. Please check the query and recompile.",
+        ),
+      )
     }
   }
 }

@@ -60,3 +60,81 @@ let pathToName = path => {
   // Make valid ReScript record name.
   uncapitalizeString(name)
 }
+
+module Errors = {
+  type loc = {
+    line: int,
+    col: int,
+  }
+
+  type error = {
+    start: loc,
+    end: loc,
+    text: string,
+  }
+
+  let extractFromString = (error, ~startLoc: loc): option<error> => {
+    let lines = error->String.split("\n")
+    let text = []
+    let codeText = []
+
+    lines->Array.forEach(line => {
+      let trimmed = line->String.trim
+      let isCodeText =
+        trimmed->String.startsWith("|") ||
+          (line->String.startsWith(" ") && trimmed->String.includes(" | "))
+
+      if isCodeText {
+        codeText->Array.push(line)
+      } else {
+        text->Array.push(line)
+      }
+    })
+
+    let lineWithHighlight = codeText->Array.at(-1)
+    let lineWithQueryLineNum = codeText->Array.at(-2)
+
+    let line = switch lineWithQueryLineNum {
+    | None => None
+    | Some(line) =>
+      line
+      ->String.trim
+      ->String.split("|")
+      ->Array.get(0)
+      ->Option.flatMap(l => l->String.trim->Int.fromString)
+      ->Option.map(l =>
+        /* EdgeDB error lines are not 0 based, so account for that */
+        l + startLoc.line - 1
+      )
+    }
+
+    switch (line, lineWithHighlight) {
+    | (Some(line), Some(content)) =>
+      switch content->String.split("|") {
+      | [_, highlightRow] =>
+        let colStart =
+          highlightRow->String.length - highlightRow->String.trimStart->String.length - 1
+        let colEnd =
+          colStart +
+          highlightRow
+          ->String.split("")
+          ->Array.filter(v => v === "^")
+          ->Array.length
+
+        Some({
+          text: text->Array.filter(l => l->String.trim !== "")->Array.joinWith("\n"),
+          start: {
+            line,
+            col: colStart,
+          },
+          end: {
+            line,
+            col: colEnd,
+          },
+        })
+      | _ => None
+      }
+    | _ => None
+    }
+  }
+}

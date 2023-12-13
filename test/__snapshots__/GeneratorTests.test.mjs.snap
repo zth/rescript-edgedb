@@ -1,0 +1,63 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`extracting errors Extracting errors #unexpectedWithTokenHint 1`] = `
+{
+  "end": {
+    "col": 12,
+    "line": 15,
+  },
+  "start": {
+    "col": 6,
+    "line": 15,
+  },
+  "text": 
+"Unexpected token: <Token IDENT "actors">
+Hint: It appears that a ',' is missing in a shape before 'actors'"
+,
+}
+`;
+
+exports[`extracting errors Extracting errors #typeOrAliasDoesNotExist 1`] = `
+{
+  "end": {
+    "col": 16,
+    "line": 20,
+  },
+  "start": {
+    "col": 15,
+    "line": 20,
+  },
+  "text": 
+"object type or alias 'default::a' does not exist
+Hint: did you mean '.id'?"
+,
+}
+`;
+
+exports[`extracting errors Extracting errors #objectTypeHasNoProp 1`] = `
+{
+  "end": {
+    "col": 21,
+    "line": 20,
+  },
+  "start": {
+    "col": 15,
+    "line": 20,
+  },
+  "text": "object type 'default::Movie' has no link or property 'TITLE'",
+}
+`;
+
+exports[`extracting errors Extracting errors #unexpected 1`] = `
+{
+  "end": {
+    "col": 16,
+    "line": 20,
+  },
+  "start": {
+    "col": 6,
+    "line": 20,
+  },
+  "text": "Unexpected 'orderaaaaa'",
+}
+`;
