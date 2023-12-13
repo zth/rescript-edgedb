@@ -4,6 +4,8 @@ Use EdgeDB fully type safe in ReScript. Embed EdgeQL right in your ReScript sour
 
 ## Getting started
 
+> There's a dedicated VSCode extension for `rescript-edgedb` that will give you a few goodies like in-editor errors for your ReScript EdgeQL queries. Install from here: https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-rescript-edgedb
+
 ```bash
 npm i rescript-edgedb rescript-embed-lang
 ```
