@@ -1,5 +1,10 @@
 # master
 
+# 0.4.0
+
+- Latest `rescript-embed-lang`.
+- VSCode extension with errors in line.
+
 # 0.3.1
 
 - Fix bug with not findings `let` bindings in nested modules.

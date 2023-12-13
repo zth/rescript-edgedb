@@ -12,7 +12,7 @@ npm i rescript-edgedb rescript-embed-lang
 
 Also make sure you have `@rescript/core >= 0.5.0`. It's required.
 
-Setup your `bsconfig.json`:
+Setup your `bsconfig.json`/`rescript.json`:
 
 ```json
 "bs-dependencies": ["@rescript/core", "rescript-edgedb"]
