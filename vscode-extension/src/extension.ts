@@ -44,24 +44,24 @@ export async function activate(context: ExtensionContext) {
             path.resolve(dir, ".generator.edgeql.log"),
             "utf-8"
           );
-          const parsed: Array<{
-            filePath: string;
-            errors: Array<{
+          const parsed: Record<
+            string,
+            Array<{
               startLoc: { line: number; col: number };
               endLoc: { line: number; col: number };
               errorMessage: string;
-            }>;
-          }> = JSON.parse(contents);
+            }>
+          > = JSON.parse(contents);
 
           // Clear diagnostics no longer present
           diagnostics.forEach((uri, _) => {
-            const inParsed = parsed.find((p) => p.filePath === uri.fsPath);
-            if (inParsed == null || inParsed.errors.length === 0) {
+            const inParsed = parsed[uri.fsPath];
+            if (inParsed?.length === 0) {
               diagnostics.delete(uri);
             }
           });
 
-          parsed.forEach(({ filePath, errors }) => {
+          Object.entries(parsed).forEach(([filePath, errors]) => {
             if (errors.length > 0) {
               diagnostics.set(
                 Uri.parse(filePath),

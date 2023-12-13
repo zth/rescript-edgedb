@@ -67,6 +67,10 @@ let main = async () => {
             "errors": errorMap->Dict.valuesToArray,
           }
         )
+        ->Array.reduce(Dict.make(), (dict, curr) => {
+          dict->Dict.set(curr["filePath"], curr["errors"])
+          dict
+        })
         ->JSON.stringifyAny
         ->Option.getWithDefault("")
         ->NodeJs.Buffer.fromString,
