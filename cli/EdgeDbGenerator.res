@@ -181,8 +181,14 @@ module AnalyzeQuery = {
     ) => {
       open Codec
 
+      let annotations = if ctx.currentPath->Array.at(0) === Some("args") {
+        "@live  \n"
+      } else {
+        ""
+      }
+
       let name = Utils.pathToName(ctx.currentPath)
-      let recordDef = `  type ${name} = {\n${fields
+      let recordDef = `${annotations}type ${name} = {\n${fields
         ->Array.mapWithIndex((field, i) => {
           let subCodec = switch (subCodecs->Array.getUnsafe(i), field.cardinality) {
           | (subCodec, ONE | NO_RESULT | AT_MOST_ONE) if subCodec->is(setCodec) =>
@@ -190,7 +196,7 @@ module AnalyzeQuery = {
           | (subCodec, _) if subCodec->is(setCodec) => subCodec->getSubcodecs->Array.getUnsafe(0)
           | (subCodec, _) => subCodec
           }
-          `    ${toReScriptPropName(field.name)}${if (
+          `  ${toReScriptPropName(field.name)}${if (
               ctx.optionalNulls && field.cardinality === AT_MOST_ONE
             ) {
               "?"
@@ -208,7 +214,7 @@ module AnalyzeQuery = {
               },
             )->generateSetType(field.cardinality)},`
         })
-        ->Array.joinWith("\n")}\n  }`
+        ->Array.joinWith("\n")}\n}`
 
       ctx.distinctTypes->Set.add(recordDef)
       name

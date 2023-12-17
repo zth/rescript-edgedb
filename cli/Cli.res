@@ -315,12 +315,14 @@ let main = async () => {
 
 ${types.distinctTypes->Set.values->Iterator.toArray->Array.joinWith("\n\n")}
 
+@live
 let query = (client: EdgeDB.Client.t${hasArgs
             ? `, args: args`
             : ""}${extraInFnArgs}): ${returnType} => {
   client->EdgeDB.QueryHelpers.${method}(queryText${hasArgs ? ", ~args" : ""}${extraInFnApply})
 }
 
+@live
 let transaction = (transaction: EdgeDB.Transaction.t${hasArgs
             ? `, args: args`
             : ""}${extraInFnArgs}): ${returnType} => {

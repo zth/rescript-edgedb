@@ -1,5 +1,7 @@
 # master
 
+- Emit `@live` annotations for relevant things in generated files.
+
 # 0.4.0
 
 - Latest `rescript-embed-lang`.
