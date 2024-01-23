@@ -314,9 +314,9 @@ module AnalyzeQuery = {
     | Exn.Error(err) =>
       errorMessage := err->Exn.message
       Console.error(
-        `${CliUtils.colorRed(
-            "ERROR in file",
-          )}: ${path}:\n${errorMessage.contents->Option.getWithDefault("-")}`,
+        `${CliUtils.colorRed("ERROR in file")}: ${path}:\n${errorMessage.contents->Option.getOr(
+            "-",
+          )}`,
       )
       await holder->BaseClientPool.Holder.release
       None
@@ -350,7 +350,7 @@ module AnalyzeQuery = {
       })
     | _ =>
       Error(
-        errorMessage.contents->Option.getWithDefault(
+        errorMessage.contents->Option.getOr(
           "This query has an unknown EdgeDB error. Please check the query and recompile.",
         ),
       )

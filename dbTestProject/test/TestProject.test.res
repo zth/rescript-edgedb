@@ -18,15 +18,13 @@ let removeIds = (key, value) => {
 describe("fetching data", () => {
   testAsync("fetching movies", async () => {
     let movies = await client->Movies.allMovies
-    let movies =
-      movies->JSON.stringifyAnyWithReplacerAndIndent(removeIds, 2)->Option.getWithDefault("")
+    let movies = movies->JSON.stringifyAnyWithReplacerAndIndent(removeIds, 2)->Option.getOr("")
     expect(movies)->Expect.toMatchSnapshot
   })
 
   testAsync("fetching single movie", async () => {
     let movie = await client->Movies.movieByTitle(~title="The Great Adventure")
-    let movie =
-      movie->JSON.stringifyAnyWithReplacerAndIndent(removeIds, 2)->Option.getWithDefault("")
+    let movie = movie->JSON.stringifyAnyWithReplacerAndIndent(removeIds, 2)->Option.getOr("")
     expect(movie)->Expect.toMatchSnapshot
   })
 

@@ -20,7 +20,11 @@ let usage = `Usage:
     [--watch]                                             | Runs this command in watch mode.
     
   unused-selections                                       | Check if we there are unused selections in your EdgeQL queries.
-    [--ci]                                                | Run in CI mode.`
+    [--ci]                                                | Run in CI mode.
+  
+  ui-url                                                  | Get the URL for opening the local EdgeDB UI.
+  
+  extract <filePath>                                      | Extract all %edgeql tags in file at <filePath>.`
 
 type config = {client: EdgeDB.Client.t}
 
@@ -72,7 +76,7 @@ let main = async () => {
           dict
         })
         ->JSON.stringifyAny
-        ->Option.getWithDefault("")
+        ->Option.getOr("")
         ->NodeJs.Buffer.fromString,
       )
     }
@@ -169,8 +173,21 @@ let main = async () => {
 
       {client: client}
     },
-    ~handleOtherCommand=async ({args, command}) => {
+    ~handleOtherCommand=async ({args, command, config}) => {
       switch command {
+      | "ui-url" =>
+        let getNormalizedConfig: EdgeDB.Client.t => promise<
+          'a,
+        > = %raw(`async function getNormalizedConfig(client) {
+          return (await client.pool._getNormalizedConnectConfig()).connectionParams
+        }`)
+
+        let connectionConfig = await getNormalizedConfig(config.client)
+
+        let url = `http://${connectionConfig["address"]->Array.joinWith(
+            ":",
+          )}/ui/${connectionConfig["database"]}`
+        Console.log(url)
       | "unused-selections" =>
         let ci = args->RescriptEmbedLang.CliArgs.hasArg("--ci")
 
@@ -198,7 +215,7 @@ let main = async () => {
         content
         ->String.split("# @name ")
         ->Array.get(1)
-        ->Option.getWithDefault("")
+        ->Option.getOr("")
         ->String.split(" ")
         ->Array.get(0)
         ->Option.map(EdgeDbGenerator__Utils.capitalizeString)
@@ -224,7 +241,7 @@ let main = async () => {
           while !break.contents {
             let currentLineCount = lineCount.contents
             lineCount := currentLineCount + 1
-            let line = lines->Array.get(currentLineCount)->Option.getWithDefault("")
+            let line = lines->Array.get(currentLineCount)->Option.getOr("")
             if line->String.includes("@name") {
               switch line->String.split("# @name ") {
               | [before, _after] =>
@@ -350,7 +367,7 @@ let transaction = (transaction: EdgeDB.Transaction.t${hasArgs
           let migrations =
             (await config.client
             ->EdgeDB.QueryHelpers.single("select count(schema::Migration)"))
-            ->Option.getWithDefault(-1)
+            ->Option.getOr(-1)
 
           debug(`[schema change detection] Found ${migrations->Int.toString} migrations`)
           let currentMigrationsCount = migrationsCount.contents
