@@ -1,5 +1,7 @@
 # master
 
+# 0.5.0
+
 - Add `extract` and `ui-url` commands to CLI.
 - Emit `@live` annotations for relevant things in generated files.
 - Latest `rescript-embed-lang`.
