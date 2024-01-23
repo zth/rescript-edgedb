@@ -187,7 +187,7 @@ let main = async () => {
         let url = `http://${connectionConfig["address"]->Array.joinWith(
             ":",
           )}/ui/${connectionConfig["database"]}`
-        Console.log(url)
+        url->JSON.stringifyAny->Console.log
       | "unused-selections" =>
         let ci = args->RescriptEmbedLang.CliArgs.hasArg("--ci")
 
