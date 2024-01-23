@@ -14,9 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rescript/core": "0.5.0",
-    "rescript": "11.0.0-rc.7",
+    "@rescript/core": "0.6.0",
+    "rescript": "11.0.0",
     "rescript-edgedb": "../",
-    "rescript-embed-lang": "0.3.0"
+    "rescript-embed-lang": "0.4.0"
   }
 }
