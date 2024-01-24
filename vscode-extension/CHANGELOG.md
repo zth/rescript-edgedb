@@ -1,5 +1,7 @@
 # main
 
+- Tidy up query pasting.
+
 # 0.3.0
 
 - Add snippets for inserting `%edgeql` blocks.

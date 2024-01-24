@@ -251,7 +251,7 @@ export async function activate(context: ExtensionContext) {
         );
         const lines = query.trim().split("\n");
         // First line has the comment with the query name, so the second line will have the offset
-        const offset = lines[1].match(/^\s*/)?.[0].length ?? 0;
+        const offset = lines[1]?.match(/^\s*/)?.[0].length ?? 2;
         const offsetAsStr = Array.from({ length: offset })
           .map((_) => " ")
           .join("");
@@ -369,6 +369,11 @@ export async function activate(context: ExtensionContext) {
                 const textToInsert = [
                   "",
                   ...clipboardContents.split("\n").map((l) => offsetAsStr + l),
+                  Array.from({
+                    length: Math.max(0, waitingForPaste.offset - 2),
+                  })
+                    .map((_) => " ")
+                    .join(""),
                 ].join("\n");
 
                 results.push({
