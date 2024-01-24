@@ -1,5 +1,7 @@
 # main
 
+# 0.3.1
+
 - Tidy up query pasting.
 
 # 0.3.0
