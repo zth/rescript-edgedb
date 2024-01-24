@@ -1,5 +1,9 @@
 # main
 
+# 0.3.2
+
+- Add readme.
+
 # 0.3.1
 
 - Tidy up query pasting.
