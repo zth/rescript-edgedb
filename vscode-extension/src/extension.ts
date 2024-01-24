@@ -16,10 +16,15 @@ import {
   window,
   commands,
   env,
+  CodeAction,
+  Command,
+  WorkspaceEdit,
 } from "vscode";
 
 let tempFilePrefix = "rescript_edgedb_" + process.pid + "_";
 let tempFileId = 0;
+
+type loc = { line: number; col: number };
 
 function createFileInTempDir() {
   let tempFileName = tempFilePrefix + tempFileId + ".res";
@@ -74,8 +79,8 @@ async function setupErrorLogWatcher(context: ExtensionContext) {
           const parsed: Record<
             string,
             Array<{
-              startLoc: { line: number; col: number };
-              endLoc: { line: number; col: number };
+              startLoc: loc;
+              endLoc: loc;
               errorMessage: string;
             }>
           > = JSON.parse(contents);
@@ -142,12 +147,21 @@ async function setupErrorLogWatcher(context: ExtensionContext) {
 
 type dataFromFile = {
   content: string;
-  start: { line: number; col: number };
-  end: { line: number; col: number };
+  start: loc;
+  end: loc;
   tag: string;
 };
 
 const edgeqlContent: Map<string, dataFromFile[]> = new Map();
+const waitingForPastes: Map<
+  string,
+  {
+    queryName: string;
+    offset: number;
+    start: loc;
+    end: loc;
+  }
+> = new Map();
 
 function callRescriptEdgeDBCli(command: string[], cwd: string) {
   const dotEnvLoc = path.join(cwd, ".env");
@@ -189,7 +203,11 @@ function updateContent(e: TextDocument) {
   }
 }
 
-async function setupCodeActions(context: ExtensionContext) {
+function extractQueryName(str: string): string | undefined {
+  return str.trim().split("\n")[0]?.split("@name ")[1]?.trim();
+}
+
+async function setupDocumentWatchers(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidOpenTextDocument((e) => {
       updateContent(e);
@@ -197,7 +215,8 @@ async function setupCodeActions(context: ExtensionContext) {
   );
   context.subscriptions.push(
     workspace.onDidCloseTextDocument((e) => {
-      updateContent(e);
+      edgeqlContent.delete(e.fileName);
+      waitingForPastes.delete(e.fileName);
     })
   );
   context.subscriptions.push(
@@ -211,12 +230,22 @@ export async function activate(context: ExtensionContext) {
   let currentWorkspacePath = workspace.workspaceFolders?.[0].uri.fsPath;
   if (currentWorkspacePath == null) throw new Error("Init failed.");
 
-  await Promise.all([setupErrorLogWatcher(context), setupCodeActions(context)]);
+  await Promise.all([
+    setupErrorLogWatcher(context),
+    setupDocumentWatchers(context),
+  ]);
 
   context.subscriptions.push(
     commands.registerCommand(
       "vscode-rescript-edgedb-open-ui",
-      async (query: string, cwd: string) => {
+      async (
+        query: string,
+        cwd: string,
+        fileName: string,
+        start: loc,
+        end: loc,
+        copyToClipboard: boolean
+      ) => {
         const url = JSON.parse(
           callRescriptEdgeDBCli(["ui-url"], cwd).toString()
         );
@@ -227,22 +256,63 @@ export async function activate(context: ExtensionContext) {
           .map((_) => " ")
           .join("");
 
-        await env.clipboard.writeText(
-          lines
-            .map((l) => {
-              const leadingWhitespace = l.slice(0, offset);
-              if (leadingWhitespace === offsetAsStr) {
-                return l.slice(offset);
-              }
+        const queryText = lines
+          .map((l) => {
+            const leadingWhitespace = l.slice(0, offset);
+            if (leadingWhitespace === offsetAsStr) {
+              return l.slice(offset);
+            }
 
-              return l;
-            })
-            .join("\n")
+            return l;
+          })
+          .join("\n");
+
+        if (copyToClipboard) {
+          await env.clipboard.writeText(queryText);
+
+          const queryName = extractQueryName(queryText);
+          if (queryName != null) {
+            waitingForPastes.set(fileName, {
+              start,
+              end,
+              offset,
+              queryName: "",
+            });
+          }
+          window.showInformationMessage(
+            "The EdgeQL query was copied to the clipboard."
+          );
+        }
+
+        const _didOpen = await env.openExternal(Uri.parse(`${url}/editor`));
+      }
+    )
+  );
+
+  context.subscriptions.push(
+    commands.registerCommand(
+      "vscode-rescript-edgedb-paste-edited-query",
+      async (
+        documentUri: string,
+        start: loc,
+        end: loc,
+        textToInsert: string,
+        fileName: string
+      ) => {
+        const edit = new WorkspaceEdit();
+
+        edit.replace(
+          Uri.parse(documentUri),
+          new Range(
+            new Position(start.line, start.col),
+            new Position(end.line, end.col)
+          ),
+          textToInsert
         );
-        window.showInformationMessage(
-          "The EdgeQL query was copied to the clipboard!\nOpening the EdgeDB UI in the browser..."
-        );
-        env.openExternal(Uri.parse(`${url}/editor`));
+
+        workspace.applyEdit(edit);
+
+        waitingForPastes.delete(fileName);
       }
     )
   );
@@ -253,9 +323,69 @@ export async function activate(context: ExtensionContext) {
         language: "rescript",
       },
       {
-        provideCodeActions(document, range, _context, _token) {
+        async provideCodeActions(document, range, _context, _token) {
           const cwd = findProjectPackageJsonRoot(document.fileName);
           const contentInFile = edgeqlContent.get(document.fileName) ?? [];
+          const waitingForPaste = waitingForPastes.get(document.fileName);
+
+          const results: (CodeAction | Command)[] = [];
+
+          // Check for active pastes
+          if (waitingForPaste != null) {
+            const startPos = new Position(
+              waitingForPaste.start.line,
+              waitingForPaste.start.col
+            );
+
+            const endPos = new Position(
+              waitingForPaste.end.line,
+              waitingForPaste.end.col
+            );
+
+            const targetToPaste = contentInFile.find((c) => {
+              const start = new Position(c.start.line, c.start.col);
+              const end = new Position(c.end.line, c.end.col);
+              return (
+                startPos.isAfterOrEqual(start) && endPos.isBeforeOrEqual(end)
+              );
+            });
+
+            if (targetToPaste != null) {
+              const clipboardContents = (await env.clipboard.readText()).trim();
+              const queryName = extractQueryName(clipboardContents);
+              const targetToPasteContent = targetToPaste.content.trim();
+
+              if (
+                queryName != null &&
+                queryName === extractQueryName(targetToPasteContent) &&
+                clipboardContents !== targetToPasteContent
+              ) {
+                const offsetAsStr = Array.from({
+                  length: waitingForPaste.offset,
+                })
+                  .map((_) => " ")
+                  .join("");
+
+                const textToInsert = [
+                  "",
+                  ...clipboardContents.split("\n").map((l) => offsetAsStr + l),
+                ].join("\n");
+
+                results.push({
+                  title: `Insert modified EdgeQL query "${queryName}"`,
+                  command: "vscode-rescript-edgedb-paste-edited-query",
+                  arguments: [
+                    document.uri.toString(),
+                    targetToPaste.start,
+                    targetToPaste.end,
+                    textToInsert,
+                    document.fileName,
+                  ],
+                });
+              }
+            }
+          }
+
           const targetWithCursor = contentInFile.find((c) => {
             const start = new Position(c.start.line, c.start.col);
             const end = new Position(c.end.line, c.end.col);
@@ -266,17 +396,36 @@ export async function activate(context: ExtensionContext) {
           });
 
           if (targetWithCursor != null && cwd != null) {
-            return [
-              {
-                title: "Open the EdgeDB UI query editor",
-                command: "vscode-rescript-edgedb-open-ui",
-                arguments: [targetWithCursor.content, cwd],
-                tooltip: "The EdgeQL query will be copied to the clipboard.",
-              },
-            ];
+            results.push({
+              title:
+                "Open EdgeDB UI query editor (+ copy query to the clipboard)",
+              command: "vscode-rescript-edgedb-open-ui",
+              arguments: [
+                targetWithCursor.content,
+                cwd,
+                document.fileName,
+                targetWithCursor.start,
+                targetWithCursor.end,
+                true,
+              ],
+              tooltip: "The EdgeQL query will be copied to the clipboard.",
+            });
+            results.push({
+              title:
+                "Open EdgeDB UI query editor (without copying the query to the clipboard)",
+              command: "vscode-rescript-edgedb-open-ui",
+              arguments: [
+                targetWithCursor.content,
+                cwd,
+                document.fileName,
+                targetWithCursor.start,
+                targetWithCursor.end,
+                false,
+              ],
+            });
           }
 
-          return [];
+          return results;
         },
       }
     )
