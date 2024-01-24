@@ -4,7 +4,7 @@ Use EdgeDB fully type safe in ReScript. Embed EdgeQL right in your ReScript sour
 
 ## Getting started
 
-> There's a dedicated VSCode extension for `rescript-edgedb` that will give you a few goodies like in-editor errors for your ReScript EdgeQL queries. Install from here: https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-rescript-edgedb
+> There's a dedicated VSCode extension for `rescript-edgedb` that will give you a few goodies like in-editor errors for your ReScript EdgeQL queries. Install from here: https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-rescript-edgedb. Read more about [its capabilities here](#vscode-extension).
 
 ```bash
 npm i rescript-edgedb rescript-embed-lang
@@ -224,19 +224,56 @@ module FindMoviesQuery = {
 
 Thanks to `rescript-embed-lang`, you don't have to think about that generated file at all. It's automatically managed for you.
 
+## VSCode extension
+
+`rescript-edgedb` comes with a dedicated [VSCode extension](https://marketplace.visualstudio.com/items?itemName=GabrielNordeborn.vscode-rescript-edgedb) designed to enhance the experience of using ReScript and EdgeDB together. Below is a list of how you use it, and what it can do.
+
+> NOTE: Make sure you install the [official EdgeDB extension](https://marketplace.visualstudio.com/items?itemName=magicstack.edgedb) as well, so you get syntax highlighting and more.
+
+### Snippets
+
+Snippets for easily adding new `%edgeql` blocks are included:
+
+<video width="320" height="240" controls>
+  <source src="https://github.com/zth/rescript-edgedb/assets/1457626/b2065915-23f0-44b1-8b8c-aef4dac6d497" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+These appear as soon as you start writing `%edgeql` in a ReScript file.
+
+### In editor error messages
+
+Any errors for your EdgeQL queries will show directly in your ReScript files that define them:
+
+<video width="320" height="240" controls>
+  <source src="https://github.com/zth/rescript-edgedb/assets/1457626/61788b2a-3370-4b87-929c-15fdc4c75171" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### Easily edit queries in the dedicated EdgeDB UI
+
+You can easily open the local EdgeDB UI, edit your query in there (including running it, etc), and then insert the modified query back:
+
+<video width="320" height="240" controls>
+  <source src="https://github.com/zth/rescript-edgedb/assets/1457626/eddbcb01-b49c-4e6a-b593-55fba2dc1b96" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+It works like this:
+
+1. Put the cursor in the query you want to edit.
+2. Activate code actions.
+3. Select the code action for opening the EdgeDB UI and copying the query.
+4. The local EdgeDB query editor UI will now open in your browser, and the EdgeQL query you had your cursor in will be copied to your clipboard.
+5. Paste the query into the query editor and make the edits you want.
+6. Copy the entire query text and go back to VSCode and the file which has your query.
+7. Activate code actions again and select the code action for inserting your modified query.
+8. Done!
+
 ## FAQ
 
 **Should I check the generated files into source control?**
 Yes, you should. This ensures building the project doesn't _have_ to rely on a running EdgeDB instance (which the code generation tooling requires).
-
-## WIP
-
-- [x] Simple transactions support
-- [x] CLI to statically prevent overfetching
-- [ ] Improve CLI docs
-- [x] Test/example project
-- [x] Figure out publishing
-- [ ] Generate docs using new ReScript doc generation
 
 ## Contributing
 
