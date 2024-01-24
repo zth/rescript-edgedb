@@ -234,10 +234,7 @@ Thanks to `rescript-embed-lang`, you don't have to think about that generated fi
 
 Snippets for easily adding new `%edgeql` blocks are included:
 
-<video width="320" height="240" controls>
-  <source src="https://github.com/zth/rescript-edgedb/assets/1457626/b2065915-23f0-44b1-8b8c-aef4dac6d497" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+![snippets](https://github.com/zth/rescript-edgedb/assets/1457626/8dc1c54b-470d-4dee-9598-e26d35632286)
 
 These appear as soon as you start writing `%edgeql` in a ReScript file.
 
@@ -245,19 +242,13 @@ These appear as soon as you start writing `%edgeql` in a ReScript file.
 
 Any errors for your EdgeQL queries will show directly in your ReScript files that define them:
 
-<video width="320" height="240" controls>
-  <source src="https://github.com/zth/rescript-edgedb/assets/1457626/61788b2a-3370-4b87-929c-15fdc4c75171" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+![in-editor-errors](https://github.com/zth/rescript-edgedb/assets/1457626/19f6bf01-5648-4354-b510-881ed9b05c3a)
 
 ### Easily edit queries in the dedicated EdgeDB UI
 
 You can easily open the local EdgeDB UI, edit your query in there (including running it, etc), and then insert the modified query back:
 
-<video width="320" height="240" controls>
-  <source src="https://github.com/zth/rescript-edgedb/assets/1457626/eddbcb01-b49c-4e6a-b593-55fba2dc1b96" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+![open-in-edgedb-ui](https://github.com/zth/rescript-edgedb/assets/1457626/e4dca50c-de60-4a78-8de9-f195a2cfd88d)
 
 It works like this:
 
