@@ -1,5 +1,7 @@
 # main
 
+# 0.3.0
+
 - Add snippets for inserting `%edgeql` blocks.
 
 # 0.2.0
