@@ -1,0 +1,22 @@
+{
+  "Insert EdgeQL query block": {
+    "prefix": "%edgeql",
+    "body": [
+      "let query = %edgeql(`",
+      "  # @name ${TM_FILENAME_BASE}Query",
+      "  $0",
+      "`)"
+    ],
+    "description": "Insert EdgeQL query block"
+  },
+  "Insert EdgeQL query block (as module)": {
+    "prefix": "%edgeql",
+    "body": [
+      "module Query = %edgeql(`",
+      "  # @name ${TM_FILENAME_BASE}Query",
+      "  $0",
+      "`)"
+    ],
+    "description": "Insert EdgeQL query block (as module)"
+  }
+}

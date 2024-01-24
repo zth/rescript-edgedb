@@ -27,6 +27,14 @@
     "Other"
   ],
   "icon": "images/icon.png",
+  "contributes": {
+    "snippets": [
+      {
+        "language": "rescript",
+        "path": "./snippets.json"
+      }
+    ]
+  },
   "galleryBanner": {
     "color": "#171E26",
     "theme": "dark"
