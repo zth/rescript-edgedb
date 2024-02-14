@@ -235,6 +235,18 @@ export async function activate(context: ExtensionContext) {
     setupDocumentWatchers(context),
   ]);
 
+  languages.registerCompletionItemProvider(
+    {
+      language: "rescript",
+    },
+    {
+      provideCompletionItems(d, p) {
+        const pkgJson = findProjectPackageJsonRoot(d.fileName);
+        return [];
+      },
+    }
+  );
+
   context.subscriptions.push(
     commands.registerCommand(
       "vscode-rescript-edgedb-open-ui",

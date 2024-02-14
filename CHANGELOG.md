@@ -1,5 +1,9 @@
 # master
 
+# 0.6.0
+
+- Up peer dependencies to support ReScript `11.1.0-rc.2` and Core `1.0.0`.
+
 # 0.5.0
 
 - Add `extract` and `ui-url` commands to CLI.
