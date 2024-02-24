@@ -1,6 +1,6 @@
 {
   "name": "rescript-edgedb",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Use EdgeDB in ReScript.",
   "main": "src/EdgeDB.mjs",
   "bin": "dist/Cli.js",

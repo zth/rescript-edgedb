@@ -1,5 +1,7 @@
 # master
 
+# 0.6.1
+
 - Fix issue with unused selections CLI.
 
 # 0.6.0
