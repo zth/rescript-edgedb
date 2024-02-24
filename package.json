@@ -7,7 +7,8 @@
   "scripts": {
     "test": "bun test test/*.test.mjs",
     "build:res": "rescript",
-    "build": "npm run build:res && esbuild --external:edgedb --external:chokidar --external:fast-glob --platform=node --bundle cli/Cli.mjs --outfile=dist/Cli.js --minify --tree-shaking"
+    "build": "npm run build:res && esbuild --external:edgedb --external:chokidar --external:fast-glob --platform=node --bundle cli/Cli.mjs --outfile=dist/Cli.js --minify --tree-shaking",
+    "prepublish": "build"
   },
   "sideEffects": false,
   "keywords": [
