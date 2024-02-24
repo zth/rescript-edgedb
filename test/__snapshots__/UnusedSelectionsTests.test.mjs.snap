@@ -3,108 +3,38 @@
 exports[`it can extract results 1`] = `
 [
   [
-    "QueryFile",
+    "Movies",
     {
-      "fieldName": "age",
-      "queryName": "FindMovies",
+      "fieldName": "numberOfPets",
+      "queryName": "AllMovies",
       "recordPath": [
         "actors",
       ],
     },
   ],
   [
-    "QueryFile",
+    "Movies",
     {
       "fieldName": "title",
-      "queryName": "FindMovies",
+      "queryName": "AllMovies",
       "recordPath": undefined,
     },
   ],
   [
-    "SingleMovie6",
+    "Movies",
     {
       "fieldName": "name",
-      "queryName": "FindMovieQuery",
+      "queryName": "MovieByTitle",
       "recordPath": [
         "actors",
       ],
     },
   ],
   [
-    "SingleMovie6",
+    "Movies",
     {
-      "fieldName": "age",
-      "queryName": "FindMovieQuery",
-      "recordPath": [
-        "actors",
-      ],
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "title",
-      "queryName": "FindMovieQuery",
-      "recordPath": undefined,
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "status",
-      "queryName": "FindMovieQuery",
-      "recordPath": undefined,
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "actors",
-      "queryName": "FindMovieQuery",
-      "recordPath": undefined,
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "name",
-      "queryName": "FindMovieQuery2",
-      "recordPath": [
-        "actors",
-      ],
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "age",
-      "queryName": "FindMovieQuery2",
-      "recordPath": [
-        "actors",
-      ],
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "title",
-      "queryName": "FindMovieQuery2",
-      "recordPath": undefined,
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "status",
-      "queryName": "FindMovieQuery2",
-      "recordPath": undefined,
-    },
-  ],
-  [
-    "SingleMovie6",
-    {
-      "fieldName": "actors",
-      "queryName": "FindMovieQuery2",
+      "fieldName": "id",
+      "queryName": "MovieByTitle",
       "recordPath": undefined,
     },
   ],
