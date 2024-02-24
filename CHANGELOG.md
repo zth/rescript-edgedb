@@ -1,5 +1,7 @@
 # master
 
+- Fix issue with unused selections CLI.
+
 # 0.6.0
 
 - Up peer dependencies to support ReScript `11.1.0-rc.2` and Core `1.0.0`.

@@ -1,15 +1,11 @@
 let adapter = EdgeDbGenerator__Utils.adapter
 
-let extractFileNameRegExp = %re("/\/([^\/]*?)__edgeql\.\w+\"/")
+let extractFileNameRegExp = %re("/\/([^\/]*?)__edgeql\.res/")
 
 let extractFileName = line => {
-  if line->String.startsWith("  File") {
-    switch line->String.match(extractFileNameRegExp) {
-    | Some([_, fileName]) => Some(fileName)
-    | _ => None
-    }
-  } else {
-    None
+  switch line->String.trim->String.match(extractFileNameRegExp) {
+  | Some([_, fileName]) => Some(fileName)
+  | _ => None
   }
 }
 
@@ -21,7 +17,7 @@ type extractedLineInfo = {
 let extractLineInfo = line => {
   switch line->String.trim->String.split(" ")->List.fromArray {
   | list{info, ...rest} =>
-    let restText = rest->List.toArray->Array.joinWith(" ")
+    let restText = rest->List.toArray->Array.joinWith(" ")->String.trim
     switch (info->String.split("."), restText) {
     | ([queryName, recordName, fieldName], "is a record label never used to read a value")
       if !(recordName->String.startsWith("args")) =>
@@ -43,20 +39,25 @@ let extractFromReanalyzeOutput = (output: string) => {
   output
   ->String.split("\n\n")
   ->Array.filterMap(text => {
-    let lines = text->String.split("\n")
-    let index = ref(0)
-    lines->Array.findMap(line => {
-      let currentIndex = index.contents
-      index := currentIndex + 1
-      switch (line->String.startsWith("  File \""), lines[currentIndex + 1]) {
-      | (true, Some(nextLine)) =>
-        switch (extractFileName(line), extractLineInfo(nextLine)) {
-        | (Some(fileName), Some(fileInfo)) => Some((fileName, fileInfo))
+    if text->String.includes("__edgeql.res") {
+      let lines = text->String.split("\n")
+      let index = ref(0)
+      lines->Array.findMap(line => {
+        let currentIndex = index.contents
+        index := currentIndex + 1
+
+        switch (line->String.includes("__edgeql.res"), lines[currentIndex + 1]) {
+        | (true, Some(nextLine)) =>
+          switch (extractFileName(line), extractLineInfo(nextLine)) {
+          | (Some(fileName), Some(fileInfo)) => Some((fileName, fileInfo))
+          | _ => None
+          }
         | _ => None
         }
-      | _ => None
-      }
-    })
+      })
+    } else {
+      None
+    }
   })
 }
 
@@ -65,7 +66,7 @@ external childProcess: 'a = "default"
 
 let readReanalyzeOutput = () => {
   Promise.make((resolve, reject) => {
-    let p = childProcess["spawn"]("npx", ["--yes", "reanalyze", "-dce"])
+    let p = childProcess["spawn"]("npx", ["--yes", "@rescript/tools", "reanalyze", "-dce"])
 
     switch p["stdout"]->Nullable.toOption {
     | None =>
@@ -114,7 +115,7 @@ let reportResults = results => {
     byFile
     ->Dict.toArray
     ->Array.forEach(((fileName, fileInfos)) => {
-      Console.log(`\nFile "${fileName}":`)
+      Console.log(`\nFile "${fileName}.res":`)
       let byQuery = Dict.make()
       fileInfos->Array.forEach(fileInfo => {
         switch byQuery->Dict.get(fileInfo.queryName) {
@@ -130,9 +131,9 @@ let reportResults = results => {
           fileInfo => {
             let contextMessage = switch fileInfo.recordPath {
             | None | Some([]) => ""
-            | Some(path) => `${path->Array.joinWith(".")}: `
+            | Some(path) => `${path->Array.joinWith(".")}`
             }
-            Console.log(`    - ${contextMessage}${fileInfo.fieldName}`)
+            Console.log(`    - ${contextMessage}.${fileInfo.fieldName}`)
           },
         )
       })
