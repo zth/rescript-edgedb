@@ -214,7 +214,7 @@ module AnalyzeQuery = {
               },
             )->generateSetType(field.cardinality)},`
         })
-        ->Array.joinWith("\n")}\n}`
+        ->Array.join("\n")}\n}`
 
       ctx.distinctTypes->Set.add(recordDef)
       name
@@ -231,11 +231,11 @@ module AnalyzeQuery = {
               let name = polyVariantNameNeedsEscapingRegex->RegExp.test(v) ? v : `"${v}"`
               `#${name}`
             })
-            ->Array.joinWith(" | ")}]`
+            ->Array.join(" | ")}]`
         } else if codec->is(int16Codec) || codec->is(int32Codec) {
           "int"
         } else if codec->is(bigintCodec) {
-          "BigInt.t"
+          "bigint"
         } else if codec->is(jsonCodec) {
           "JSON.t"
         } else {
@@ -277,7 +277,7 @@ module AnalyzeQuery = {
         `(${codec
           ->getSubcodecs
           ->Array.map(subCodec => walkCodec(subCodec, ctx))
-          ->Array.joinWith(", ")})`
+          ->Array.join(", ")})`
       } else if codec->is(rangeCodec) {
         let subCodec = codec->getSubcodecs->Array.getUnsafe(0)
         if !(subCodec->is(scalarCodec)) {

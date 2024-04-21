@@ -17,7 +17,7 @@ type extractedLineInfo = {
 let extractLineInfo = line => {
   switch line->String.trim->String.split(" ")->List.fromArray {
   | list{info, ...rest} =>
-    let restText = rest->List.toArray->Array.joinWith(" ")->String.trim
+    let restText = rest->List.toArray->Array.join(" ")->String.trim
     switch (info->String.split("."), restText) {
     | ([queryName, recordName, fieldName], "is a record label never used to read a value")
       if !(recordName->String.startsWith("args")) =>
@@ -131,7 +131,7 @@ let reportResults = results => {
           fileInfo => {
             let contextMessage = switch fileInfo.recordPath {
             | None | Some([]) => ""
-            | Some(path) => `${path->Array.joinWith(".")}`
+            | Some(path) => `${path->Array.join(".")}`
             }
             Console.log(`    - ${contextMessage}.${fileInfo.fieldName}`)
           },

@@ -137,7 +137,7 @@ let main = async () => {
             panic(
               `Invalid value for --tls-security. Must be one of: ${validTlsSecurityValues
                 ->Array.map(x => `"${x}"`)
-                ->Array.joinWith(" | ")}`,
+                ->Array.join(" | ")}`,
             )
           } else {
             switch tlsSec {
@@ -184,7 +184,7 @@ let main = async () => {
 
         let connectionConfig = await getNormalizedConfig(config.client)
 
-        let url = `http://${connectionConfig["address"]->Array.joinWith(
+        let url = `http://${connectionConfig["address"]->Array.join(
             ":",
           )}/ui/${connectionConfig["database"]}`
         url->JSON.stringifyAny->Console.log
@@ -330,7 +330,7 @@ let main = async () => {
       fileOutput->Array.push(
         `let queryText = \`${queryText}\`
 
-${types.distinctTypes->Set.values->Iterator.toArray->Array.joinWith("\n\n")}
+${types.distinctTypes->Set.values->Iterator.toArray->Array.join("\n\n")}
 
 @live
 let query = (client: EdgeDB.Client.t${hasArgs
@@ -348,7 +348,7 @@ let transaction = (transaction: EdgeDB.Transaction.t${hasArgs
             : ""}${extraInFnApply})
 }`,
       )
-      let content = fileOutput->Array.joinWith("")
+      let content = fileOutput->Array.join("")
 
       // Sync errors
       syncErrors()->Promise.done

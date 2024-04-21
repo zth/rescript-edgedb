@@ -657,7 +657,7 @@ module DataTypes = {
     type t
 
     @get external bytes: t => float = "bytes"
-    @get external bytesBigInt: t => BigInt.t = "bytesBigInt"
+    @get external bytesBigInt: t => bigint = "bytesBigInt"
     @get external kibibytes: t => float = "kibibytes"
     @get external mebibytes: t => float = "mebibytes"
     @get external gibibytes: t => float = "gibibytes"

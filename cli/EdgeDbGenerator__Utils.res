@@ -55,7 +55,7 @@ let uncapitalizeString = str =>
   `${str->String.slice(~start=0, ~end=1)->String.toLowerCase}${str->String.sliceToEnd(~start=1)}`
 
 let pathToName = path => {
-  let name = path->Array.joinWith("__")
+  let name = path->Array.join("__")
 
   // Make valid ReScript record name.
   uncapitalizeString(name)
@@ -122,7 +122,7 @@ module Errors = {
           ->Array.length
 
         Some({
-          text: text->Array.filter(l => l->String.trim !== "")->Array.joinWith("\n"),
+          text: text->Array.filter(l => l->String.trim !== "")->Array.join("\n"),
           start: {
             line,
             col: colStart,
