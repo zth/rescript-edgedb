@@ -10,7 +10,7 @@ Use EdgeDB fully type safe in ReScript. Embed EdgeQL right in your ReScript sour
 npm i rescript-edgedb rescript-embed-lang
 ```
 
-Also make sure you have `@rescript/core >= 0.5.0`. It's required.
+Also make sure you have `@rescript/core >= 1.3.0`. It's required from `rescript-edgedb >=0.8.0`.
 
 Setup your `bsconfig.json`/`rescript.json`:
 
