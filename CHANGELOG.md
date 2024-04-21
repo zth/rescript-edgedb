@@ -1,5 +1,7 @@
 # master
 
+- Depend on ReScript `>=11.1.0` and latest `Core`.
+
 # 0.6.1
 
 - Fix issue with unused selections CLI.
