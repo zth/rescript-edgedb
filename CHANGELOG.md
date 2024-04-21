@@ -1,5 +1,7 @@
 # master
 
+# 0.7.0
+
 - Depend on ReScript `>=11.1.0` and latest `Core`.
 
 # 0.6.1
