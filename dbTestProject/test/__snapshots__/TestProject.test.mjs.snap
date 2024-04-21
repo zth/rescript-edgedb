@@ -70,12 +70,12 @@ exports[`run unused selections CLI 1`] = `
 
 [31m✘[0m Found 4 unused selections.
 
-File "Movies":
+File "Movies.res":
    In query "AllMovies":
-    - actors: numberOfPets
-    - title
+    - actors.numberOfPets
+    - .title
    In query "MovieByTitle":
-    - actors: name
-    - id
+    - actors.name
+    - .id
 "
 `;
