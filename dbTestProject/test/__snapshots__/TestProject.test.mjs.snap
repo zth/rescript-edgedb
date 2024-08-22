@@ -79,3 +79,36 @@ File "Movies.res":
     - .id
 "
 `;
+
+exports[`fetching data counting movies 1`] = `
+{
+  "TAG": "Ok",
+  "_0": 3,
+}
+`;
+
+exports[`fetching data counting movies with param 1`] = `
+{
+  "TAG": "Ok",
+  "_0": 1,
+}
+`;
+
+exports[`fetching data running in a transaction 1`] = `undefined`;
+
+exports[`fetching data test bool 1`] = `
+{
+  "TAG": "Ok",
+  "_0": false,
+}
+`;
+
+exports[`fetching data test string 1`] = `
+{
+  "TAG": "Ok",
+  "_0": 
+"A raw 
+ string"
+,
+}
+`;

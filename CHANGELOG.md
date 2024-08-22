@@ -1,5 +1,7 @@
 # master
 
+- Generate response types for primitve return types (bool, string, int, etc).
+
 # 0.7.0
 
 - Depend on ReScript `>=11.1.0` and latest `Core`.
